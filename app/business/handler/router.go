@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
+	"log"
 )
 
 type BusinessMessageRouter struct {
@@ -14,16 +15,25 @@ func (mr *BusinessMessageRouter) Handle(ch <-chan *p2p.P2PMessage) {
 
 	// Waits for event
 	for msg := range ch {
-
-		// Parses event type and passes it to the correct BusinessLogicHandler based on the type
-		_, err := mr.parser.Parse(msg)
-		if err != nil {
-			panic(err)
+		if err := mr.handleMessage(msg); err != nil {
+			log.Println(err.Error())
 		}
-
-		handler := mr.handlers[string(msg.Msg)]
-		handler.Handle(msg)
 	}
+}
+
+func (mr *BusinessMessageRouter) handleMessage(msg *p2p.P2PMessage) error {
+	// Parses event type and passes it to the correct BusinessLogicHandler based on the type
+	bMsg, err := mr.parser.Parse(msg)
+	if err != nil {
+		return err
+	}
+
+	handler := mr.handlers[bMsg.Type]
+	if err := handler.Handle(msg); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (mr *BusinessMessageRouter) AddHandler(messageType string, handler BusinessLogicHandler) {
