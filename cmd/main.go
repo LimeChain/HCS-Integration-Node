@@ -1,26 +1,51 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	rfpHandler "github.com/Limechain/HCS-Integration-Node/app/business/handler/rfp"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/queue"
-	rfpPersistance "github.com/Limechain/HCS-Integration-Node/app/persistance/postgres/rfp"
+	rfpPersistance "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
+	_ "github.com/joho/godotenv/autoload"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
+func connectToDb(connString string) (*mongo.Client, *mongo.Database) {
+	client, err := mongo.NewClient(options.Client().ApplyURI(connString))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.Connect(context.Background())
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
+
+	db := client.Database("hcs-integration-node")
+
+	return client, db
+}
+
 func main() {
 
-	var s *sql.DB
+	mongoConnString := os.Getenv("MONGODB_CONN_STR")
 
-	repo := rfpPersistance.NewRFPRepository(s)
+	client, db := connectToDb(mongoConnString)
 
-	h := rfpHandler.NewRFPHandler(repo)
+	defer client.Disconnect(context.Background())
+
+	rfpRepo := rfpPersistance.NewRFPRepository(db)
+
+	h := rfpHandler.NewRFPHandler(rfpRepo)
 
 	var parser json.JSONBusinessMesssageParser
 

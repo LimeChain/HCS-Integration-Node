@@ -5,7 +5,7 @@ import (
 )
 
 type BusinessMessage struct {
-	Type string
+	Type string `json:"type"`
 }
 
 type BusinessMessageParser interface {

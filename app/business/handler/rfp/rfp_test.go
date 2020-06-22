@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestNewBusinessMessageRouter(t *testing.T) {
+func TestNewRFPHandler(t *testing.T) {
 	t.Fatal("Not Implemented")
 }
 
