@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	rfpHandler "github.com/Limechain/HCS-Integration-Node/app/business/handler/rfp"
@@ -11,14 +10,26 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/queue"
 	rfpPersistance "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	_ "github.com/joho/godotenv/autoload"
+	log "github.com/sirupsen/logrus"
 	"os"
-	"os/signal"
-	"syscall"
 )
 
 const DefaultKeyPath = "./config/key.pem"
 
 func main() {
+
+	logFilePath := os.Getenv("LOG_FILE")
+
+	if len(logFilePath) > 0 {
+		file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		defer file.Close()
+
+		setupLogger(file)
+	}
 
 	prvKey := getPrivateKey(DefaultKeyPath)
 
@@ -47,10 +58,10 @@ func main() {
 
 	messenger.Connect(q)
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	fmt.Println("[Ctrl + c] to shut down...")
-	<-quit
-	fmt.Println("Received exit signal, shutting down...")
+	apiPort := os.Getenv("API_PORT")
+
+	if err := startAPI(apiPort); err != nil {
+		panic(err)
+	}
 
 }
