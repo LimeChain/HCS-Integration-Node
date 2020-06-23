@@ -1,2 +1,3 @@
 gomon_spawn
 .env
+config/key.pem

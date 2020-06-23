@@ -7,39 +7,27 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	rfpHandler "github.com/Limechain/HCS-Integration-Node/app/business/handler/rfp"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/queue"
 	rfpPersistance "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	_ "github.com/joho/godotenv/autoload"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-func connectToDb(connString string) (*mongo.Client, *mongo.Database) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(connString))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Connect(context.Background())
-	if err != nil {
-		log.Fatal(err)
-		panic(err)
-	}
-
-	db := client.Database("hcs-integration-node")
-
-	return client, db
-}
+const DefaultKeyPath = "./config/key.pem"
 
 func main() {
 
-	mongoConnString := os.Getenv("MONGODB_CONN_STR")
+	prvKey := getPrivateKey(DefaultKeyPath)
 
-	client, db := connectToDb(mongoConnString)
+	messenger := libp2p.NewMessenger(prvKey)
+
+	mongoConnString := os.Getenv("MONGODB_CONN_STR")
+	mongoDatabaseName := os.Getenv("MONGODB_DBNAME")
+
+	client, db := connectToDb(mongoConnString, mongoDatabaseName)
 
 	defer client.Disconnect(context.Background())
 
@@ -55,7 +43,9 @@ func main() {
 
 	ch := make(chan *p2p.P2PMessage)
 
-	queue.New(ch, router)
+	q := queue.New(ch, router)
+
+	messenger.Connect(q)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
