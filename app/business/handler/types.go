@@ -1,15 +1,12 @@
 package handler
 
 import (
+	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 )
 
-type BusinessMessage struct {
-	Type string `json:"type"`
-}
-
 type BusinessMessageParser interface {
-	Parse(msg *p2p.P2PMessage) (*BusinessMessage, error)
+	Parse(msg *p2p.P2PMessage) (*messages.BusinessMessage, error)
 }
 
 type BusinessLogicHandler interface {

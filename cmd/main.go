@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
-	rfpHandler "github.com/Limechain/HCS-Integration-Node/app/business/handler/rfp"
+	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/queue"
@@ -33,11 +33,11 @@ func main() {
 
 	rfpRepo := rfpPersistance.NewRFPRepository(db)
 
-	h := rfpHandler.NewRFPHandler(rfpRepo)
+	h := handler.NewRFPHandler(rfpRepo)
 
 	var parser json.JSONBusinessMesssageParser
 
-	router := handler.NewBusinessMessageRouter(&parser)
+	router := router.NewBusinessMessageRouter(&parser)
 
 	router.AddHandler("rfp", h)
 
