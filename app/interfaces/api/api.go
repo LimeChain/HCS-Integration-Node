@@ -40,7 +40,7 @@ func NewIntegrationNodeAPI() *IntegrationNodeAPI {
 
 	r.Use(
 		render.SetContentType(render.ContentTypeJSON),
-		middleware.Logger,
+		middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: log.StandardLogger(), NoColor: true}),
 		middleware.Compress(6, "gzip"),
 		middleware.RedirectSlashes,
 		middleware.Recoverer,

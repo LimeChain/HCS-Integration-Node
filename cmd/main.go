@@ -5,6 +5,8 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	rfpHandler "github.com/Limechain/HCS-Integration-Node/app/business/handler/rfp"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/queue"
@@ -20,6 +22,8 @@ func main() {
 
 	logFilePath := os.Getenv("LOG_FILE")
 
+	setupLogger()
+
 	if len(logFilePath) > 0 {
 		file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		if err != nil {
@@ -28,7 +32,7 @@ func main() {
 
 		defer file.Close()
 
-		setupLogger(file)
+		setupFileLogger(file)
 	}
 
 	prvKey := getPrivateKey(DefaultKeyPath)
@@ -48,19 +52,23 @@ func main() {
 
 	var parser json.JSONBusinessMesssageParser
 
-	router := handler.NewBusinessMessageRouter(&parser)
+	r := handler.NewBusinessMessageRouter(&parser)
 
-	router.AddHandler("rfp", h)
+	r.AddHandler("rfp", h)
 
 	ch := make(chan *p2p.P2PMessage)
 
-	q := queue.New(ch, router)
+	q := queue.New(ch, r)
 
 	messenger.Connect(q)
 
 	apiPort := os.Getenv("API_PORT")
 
-	if err := startAPI(apiPort); err != nil {
+	a := api.NewIntegrationNodeAPI()
+
+	a.AddRouter("/rfp", router.NewRFPRouter())
+
+	if err := a.Start(apiPort); err != nil {
 		panic(err)
 	}
 
