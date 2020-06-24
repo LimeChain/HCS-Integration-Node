@@ -1,9 +1,10 @@
-package handler
+package router
 
 import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -14,8 +15,8 @@ type MockParser struct {
 	Err  error
 }
 
-func (mp *MockParser) Parse(msg *p2p.P2PMessage) (*BusinessMessage, error) {
-	return &BusinessMessage{Type: mp.Type}, mp.Err
+func (mp *MockParser) Parse(msg *p2p.P2PMessage) (*messages.BusinessMessage, error) {
+	return &messages.BusinessMessage{Type: mp.Type}, mp.Err
 }
 
 type MockHandler struct {

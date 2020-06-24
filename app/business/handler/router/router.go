@@ -1,13 +1,14 @@
-package handler
+package router
 
 import (
+	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"log"
 )
 
 type BusinessMessageRouter struct {
-	parser   BusinessMessageParser
-	handlers map[string]BusinessLogicHandler
+	parser   handler.BusinessMessageParser
+	handlers map[string]handler.BusinessLogicHandler
 }
 
 // Through this implements the ChannelMessageHandler interface needed for the MessageQueue
@@ -36,11 +37,11 @@ func (mr *BusinessMessageRouter) handleMessage(msg *p2p.P2PMessage) error {
 	return nil
 }
 
-func (mr *BusinessMessageRouter) AddHandler(messageType string, handler BusinessLogicHandler) {
+func (mr *BusinessMessageRouter) AddHandler(messageType string, handler handler.BusinessLogicHandler) {
 	mr.handlers[messageType] = handler
 }
 
-func NewBusinessMessageRouter(parser BusinessMessageParser) *BusinessMessageRouter {
-	handlers := make(map[string]BusinessLogicHandler)
+func NewBusinessMessageRouter(parser handler.BusinessMessageParser) *BusinessMessageRouter {
+	handlers := make(map[string]handler.BusinessLogicHandler)
 	return &BusinessMessageRouter{parser, handlers}
 }
