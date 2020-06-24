@@ -7,6 +7,7 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
 	rfpRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/queue"
@@ -36,6 +37,11 @@ func main() {
 	}
 
 	prvKey := getPrivateKey(DefaultKeyPath)
+
+	hcsClientID := os.Getenv("HCS_CLIENT_ID")
+	topicID := os.Getenv("HCS_TOPIC_ID")
+
+	hcs.NewHCSClient(hcsClientID, prvKey, topicID) // TODO take the client and do something with it
 
 	messenger := libp2p.NewMessenger(prvKey)
 
