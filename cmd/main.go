@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
-	rfpHandler "github.com/Limechain/HCS-Integration-Node/app/business/handler/rfp"
+	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
+	rfpRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
@@ -54,11 +54,11 @@ func main() {
 
 	rfpRepo := rfpPersistance.NewRFPRepository(db)
 
-	h := rfpHandler.NewRFPHandler(rfpRepo)
+	h := handler.NewRFPHandler(rfpRepo)
 
 	var parser json.JSONBusinessMesssageParser
 
-	r := handler.NewBusinessMessageRouter(&parser)
+	r := router.NewBusinessMessageRouter(&parser)
 
 	r.AddHandler("rfp", h)
 
@@ -72,7 +72,7 @@ func main() {
 
 	a := api.NewIntegrationNodeAPI()
 
-	a.AddRouter("/rfp", router.NewRFPRouter())
+	a.AddRouter("/rfp", rfpRouter.NewRFPRouter())
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)
