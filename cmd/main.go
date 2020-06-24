@@ -2,23 +2,38 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	rfpHandler "github.com/Limechain/HCS-Integration-Node/app/business/handler/rfp"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/queue"
 	rfpPersistance "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	_ "github.com/joho/godotenv/autoload"
+	log "github.com/sirupsen/logrus"
 	"os"
-	"os/signal"
-	"syscall"
 )
 
 const DefaultKeyPath = "./config/key.pem"
 
 func main() {
+
+	logFilePath := os.Getenv("LOG_FILE")
+
+	setupLogger()
+
+	if len(logFilePath) > 0 {
+		file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		defer file.Close()
+
+		setupFileLogger(file)
+	}
 
 	prvKey := getPrivateKey(DefaultKeyPath)
 
@@ -37,20 +52,24 @@ func main() {
 
 	var parser json.JSONBusinessMesssageParser
 
-	router := handler.NewBusinessMessageRouter(&parser)
+	r := handler.NewBusinessMessageRouter(&parser)
 
-	router.AddHandler("rfp", h)
+	r.AddHandler("rfp", h)
 
 	ch := make(chan *p2p.P2PMessage)
 
-	q := queue.New(ch, router)
+	q := queue.New(ch, r)
 
 	messenger.Connect(q)
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	fmt.Println("[Ctrl + c] to shut down...")
-	<-quit
-	fmt.Println("Received exit signal, shutting down...")
+	apiPort := os.Getenv("API_PORT")
+
+	a := api.NewIntegrationNodeAPI()
+
+	a.AddRouter("/rfp", router.NewRFPRouter())
+
+	if err := a.Start(apiPort); err != nil {
+		panic(err)
+	}
 
 }
