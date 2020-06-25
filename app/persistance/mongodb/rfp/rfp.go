@@ -20,7 +20,7 @@ func (r *RFPRepository) GetAll() ([]*model.RFP, error) {
 		return nil, err
 	}
 
-	var results []*model.RFP
+	results := make( []*model.RFP, 0)
 
 	for cur.Next(context.TODO()) {
 
@@ -50,15 +50,15 @@ func (r *RFPRepository) GetByID(id string) (*model.RFP, error) {
 }
 func (r *RFPRepository) Save(rfp *model.RFP) (string, error) {
 	collection := r.db.Collection("rfps")
-	if len(rfp.RFPID) == 0 {
-		rfp.RFPID = uuid.New().String()
+	if len(rfp.RFPId) == 0 {
+		rfp.RFPId = uuid.New().String()
 	}
 	_, err := collection.InsertOne(context.TODO(), rfp)
 	if err != nil {
 		return "", err
 	}
 
-	return rfp.RFPID, nil
+	return rfp.RFPId, nil
 }
 
 func NewRFPRepository(db *mongo.Database) *RFPRepository {

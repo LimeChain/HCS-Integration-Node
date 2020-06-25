@@ -15,6 +15,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"github.com/Limechain/HCS-Integration-Node/app/business/apiservices"
 )
 
 const DefaultKeyPath = "./config/key.pem"
@@ -72,7 +73,9 @@ func main() {
 
 	a := api.NewIntegrationNodeAPI()
 
-	a.AddRouter("/rfp", rfpRouter.NewRFPRouter())
+	rfpService := apiservices.NewRFPService(rfpRepo)
+
+	a.AddRouter("/rfp", rfpRouter.NewRFPRouter(rfpService))
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)
