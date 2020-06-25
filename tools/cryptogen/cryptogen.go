@@ -57,8 +57,6 @@ func createTestnetHederaAccount(key ed25519.PrivateKey) hedera.AccountID {
 
 	newAccountID := transactionReceipt.GetAccountID()
 
-	// TODO Fund account
-
 	transactionID, err = hedera.NewCryptoTransferTransaction().
 		AddSender(operatorAccountID, hedera.NewHbar(100)).
 		AddRecipient(newAccountID, hedera.NewHbar(100)).
