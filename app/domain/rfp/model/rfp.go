@@ -1,7 +1,7 @@
 package model
 
 type RFP struct {
-	RFPID  string `json:"rfpId" bson:"rfpId"`
+	RFPId  string `json:"rfpId" bson:"rfpId"`
 	SupplierId string `json:"supplierId" bson:"supplierId"`
 	BuyerId string `json:"buyerId" bson:"buyerId"`
 	Items []Item `json:"items" bson:"items"`

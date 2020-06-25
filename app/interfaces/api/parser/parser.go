@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
-	"github.com/golang/gddo/httputil/header"
 )
 
 type MalformedRequest struct {
@@ -20,14 +18,6 @@ func (mr *MalformedRequest) Error() string {
 }
 
 func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dst interface{}) error {
-	if r.Header.Get("Content-Type") != "" {
-		value, _ := header.ParseValueAndParams(r.Header, "Content-Type")
-		if value != "application/json" {
-			msg := "Content-Type header is not application/json"
-			return &MalformedRequest{Status: http.StatusUnsupportedMediaType, Msg: msg}
-		}
-	}
-
 	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
 
 	dec := json.NewDecoder(r.Body)
@@ -48,11 +38,6 @@ func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dst interface{}) err
 
 		case errors.As(err, &unmarshalTypeError):
 			msg := fmt.Sprintf("Request body contains an invalid value for the %q field (at position %d)", unmarshalTypeError.Field, unmarshalTypeError.Offset)
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
-
-		case strings.HasPrefix(err.Error(), "json: unknown field "):
-			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
-			msg := fmt.Sprintf("Request body contains unknown field %s", fieldName)
 			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
 
 		case errors.Is(err, io.EOF):

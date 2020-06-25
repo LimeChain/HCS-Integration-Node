@@ -13,7 +13,7 @@ import (
 )
 
 type CreateRFPRequest struct {
-	RFPID  string `json:"rfpId" bson:"rfpId"`
+	RFPId  string `json:"rfpId" bson:"rfpId"`
 	SupplierId string `json:"supplierId" bson:"supplierId"`
 	BuyerId string `json:"buyerId" bson:"buyerId"`
 	Items []requestItem `json:"items" bson:"items"`
@@ -37,7 +37,7 @@ type storedRFPsResponse struct {
 
 type createRFPResponse struct {
 	api.IntegrationNodeAPIResponse
-	RFPID string `json:"rfpId,omitempty"`
+	RFPId string `json:"rfpId,omitempty"`
 }
 
 func (rfpRequestModel *CreateRFPRequest) toRFP() *model.RFP {
@@ -57,7 +57,7 @@ func (rfpRequestModel *CreateRFPRequest) toRFP() *model.RFP {
 	}
 
 	return &model.RFP{
-		RFPID:      rfpRequestModel.RFPID,
+		RFPId:      rfpRequestModel.RFPId,
 		SupplierId: rfpRequestModel.SupplierId,
 		BuyerId:    rfpRequestModel.BuyerId,
 		Items: items,
@@ -88,7 +88,7 @@ func createRFP(rfpService *apiservices.RFPService) func(w http.ResponseWriter, r
 				return
 			}
 
-			log.Println(err.Error())
+			log.Errorln(err.Error())
 			render.JSON(w, r, createRFPResponse{api.IntegrationNodeAPIResponse{ Status: false, Error: err.Error()}, ""})
 			return
 		}
