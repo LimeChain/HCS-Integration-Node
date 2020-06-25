@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/ed25519"
+	"github.com/Limechain/HCS-Integration-Node/app/business/apiservices"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
@@ -109,7 +110,9 @@ func main() {
 
 	a := api.NewIntegrationNodeAPI()
 
-	a.AddRouter("/rfp", rfpRouter.NewRFPRouter()) // "/rfp should be configured somewhere else"
+	rfpService := apiservices.NewRFPService(rfpRepo)
+
+	a.AddRouter("/rfp", rfpRouter.NewRFPRouter(rfpService))
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)

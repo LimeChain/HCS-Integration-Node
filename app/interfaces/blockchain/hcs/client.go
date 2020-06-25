@@ -94,5 +94,7 @@ func NewHCSClient(account string, key ed25519.PrivateKey, mirrorNodeAddress, top
 		panic(err)
 	}
 
+	log.Infof("[HCS] HCS Client started with account ID: %s\n", account)
+
 	return &HCSClient{client: client, mirrorClient: &mirrorClient, topicID: hcsTopicId}
 }
