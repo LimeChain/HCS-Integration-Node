@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
 	rfpRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
