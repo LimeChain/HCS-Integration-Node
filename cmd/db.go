@@ -5,10 +5,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"os"
 )
 
-func connectToDb(connString string, databaseName string) (*mongo.Client, *mongo.Database) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(connString))
+func connectToDb() (*mongo.Client, *mongo.Database) {
+
+	mongoConnString := os.Getenv("MONGODB_CONN_STR")
+	mongoDatabaseName := os.Getenv("MONGODB_DBNAME")
+
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoConnString))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,7 +24,7 @@ func connectToDb(connString string, databaseName string) (*mongo.Client, *mongo.
 		panic(err)
 	}
 
-	db := client.Database(databaseName)
+	db := client.Database(mongoDatabaseName)
 
 	return client, db
 }

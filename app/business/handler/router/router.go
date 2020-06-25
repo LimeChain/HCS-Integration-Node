@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"log"
 )
 
@@ -12,7 +12,7 @@ type BusinessMessageRouter struct {
 }
 
 // Through this implements the ChannelMessageHandler interface needed for the MessageQueue
-func (mr *BusinessMessageRouter) Handle(ch <-chan *p2p.P2PMessage) {
+func (mr *BusinessMessageRouter) Handle(ch <-chan *common.Message) {
 
 	// Waits for event
 	for msg := range ch {
@@ -22,7 +22,7 @@ func (mr *BusinessMessageRouter) Handle(ch <-chan *p2p.P2PMessage) {
 	}
 }
 
-func (mr *BusinessMessageRouter) handleMessage(msg *p2p.P2PMessage) error {
+func (mr *BusinessMessageRouter) handleMessage(msg *common.Message) error {
 	// Parses event type and passes it to the correct BusinessLogicHandler based on the type
 	bMsg, err := mr.parser.Parse(msg)
 	if err != nil {

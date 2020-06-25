@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -15,7 +16,7 @@ type MockParser struct {
 	Err  error
 }
 
-func (mp *MockParser) Parse(msg *p2p.P2PMessage) (*messages.BusinessMessage, error) {
+func (mp *MockParser) Parse(msg *common.Message) (*messages.BusinessMessage, error) {
 	return &messages.BusinessMessage{Type: mp.Type}, mp.Err
 }
 
@@ -23,7 +24,7 @@ type MockHandler struct {
 	h func() error
 }
 
-func (m *MockHandler) Handle(msg *p2p.P2PMessage) error {
+func (m *MockHandler) Handle(msg *common.Message) error {
 	return m.h()
 }
 
@@ -88,7 +89,7 @@ func TestHandle(t *testing.T) {
 
 	cases := []struct {
 		testName            string
-		parser              BusinessMessageParser
+		parser              handler.BusinessMessageParser
 		handler             *MockHandler
 		expectHandlerCalled bool
 		expectedError       error
@@ -113,7 +114,7 @@ func TestHandle(t *testing.T) {
 			reqBytes, err := json.Marshal(req)
 			assert.Nil(t, err, "could not marshal the request")
 
-			reqMsg := p2p.P2PMessage{
+			reqMsg := common.Message{
 				Msg: reqBytes,
 				Ctx: context.Background(),
 			}

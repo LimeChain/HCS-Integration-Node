@@ -3,7 +3,7 @@ package json
 import (
 	"context"
 	"encoding/json"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -18,7 +18,7 @@ func TestParse(t *testing.T) {
 	reqBytes, err := json.Marshal(req)
 	assert.Nil(t, err, "could not marshal the request")
 
-	reqMsg := p2p.P2PMessage{
+	reqMsg := common.Message{
 		Msg: reqBytes,
 		Ctx: context.Background(),
 	}
