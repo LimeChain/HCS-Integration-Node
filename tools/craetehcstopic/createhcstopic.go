@@ -24,7 +24,6 @@ func createTestnetTopic(a, b hedera.Ed25519PublicKey) hedera.ConsensusTopicID {
 	transactionID, err := hedera.NewConsensusTopicCreateTransaction().
 		SetAdminKey(operatorPrivateKey.PublicKey()).
 		SetSubmitKey(a).
-		SetSubmitKey(b).
 		SetAutoRenewAccountID(operatorAccountID).
 		Execute(client)
 
