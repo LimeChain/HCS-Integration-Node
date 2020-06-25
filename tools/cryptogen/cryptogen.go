@@ -43,7 +43,6 @@ func createTestnetHederaAccount(key ed25519.PrivateKey) hedera.AccountID {
 
 	transactionID, err := hedera.NewAccountCreateTransaction().
 		SetKey(newKey.PublicKey()).
-		SetTransactionMemo("HCS Integration Node Account Creation").
 		Execute(client)
 
 	if err != nil {
@@ -57,6 +56,21 @@ func createTestnetHederaAccount(key ed25519.PrivateKey) hedera.AccountID {
 	}
 
 	newAccountID := transactionReceipt.GetAccountID()
+
+	transactionID, err = hedera.NewCryptoTransferTransaction().
+		AddSender(operatorAccountID, hedera.NewHbar(100)).
+		AddRecipient(newAccountID, hedera.NewHbar(100)).
+		Execute(client)
+
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = transactionID.GetReceipt(client)
+
+	if err != nil {
+		panic(err)
+	}
 
 	return newAccountID
 }

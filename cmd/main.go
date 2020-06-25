@@ -40,11 +40,22 @@ func main() {
 	prvKey := getPrivateKey(DefaultKeyPath)
 
 	hcsClientID := os.Getenv("HCS_CLIENT_ID")
+	hcsMirrorNodeID := os.Getenv("HCS_MIRROR_NODE_ADDRESS")
 	topicID := os.Getenv("HCS_TOPIC_ID")
 
-	hcs.NewHCSClient(hcsClientID, prvKey, topicID) // TODO take the client and do something with it
+	hcsClient := hcs.NewHCSClient(hcsClientID, prvKey, hcsMirrorNodeID, topicID)
 
-	messenger := libp2p.NewMessenger(prvKey)
+	err := hcsClient.Listen(nil) // This will throw if message is sent as the Receiver is not implemented
+	if err != nil {
+		panic(err)
+	}
+	// rcpt, err := hcsClient.Send(&blockchain.BlockchainMessage{Msg: []byte(fmt.Sprintf("Hello HCS from Go! Message %v", 1)), Ctx: context.TODO()})
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// log.Println(rcpt.Status)
+
+	p2pMessenger := libp2p.NewMessenger(prvKey)
 
 	mongoConnString := os.Getenv("MONGODB_CONN_STR")
 	mongoDatabaseName := os.Getenv("MONGODB_DBNAME")
@@ -67,7 +78,7 @@ func main() {
 
 	q := queue.New(ch, r)
 
-	messenger.Connect(q)
+	p2pMessenger.Connect(q)
 
 	apiPort := os.Getenv("API_PORT")
 
