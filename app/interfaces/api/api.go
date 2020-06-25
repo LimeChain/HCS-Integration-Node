@@ -17,6 +17,11 @@ type IntegrationNodeAPI struct {
 	r *chi.Mux
 }
 
+type IntegrationNodeAPIResponse struct {
+	Status bool   `json:"status"`
+	Error  string `json:"error,omitempty"`
+}
+
 func (api *IntegrationNodeAPI) AddRouter(route string, router IntegrationNodeRoute) {
 	api.r.Mount(route, router)
 }

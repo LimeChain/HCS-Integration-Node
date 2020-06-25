@@ -20,7 +20,7 @@ func (r *RFPRepository) GetAll() ([]*model.RFP, error) {
 		return nil, err
 	}
 
-	var results []*model.RFP
+	results := make( []*model.RFP, 0)
 
 	for cur.Next(context.TODO()) {
 
