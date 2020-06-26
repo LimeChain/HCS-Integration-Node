@@ -3,7 +3,7 @@ package hcs
 import (
 	"context"
 	"crypto/ed25519"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/hashgraph/hedera-sdk-go"
 	log "github.com/sirupsen/logrus"
 )
@@ -15,44 +15,55 @@ type HCSClient struct {
 }
 
 /* Example how to use Send - will be removed when implemented
-rcpt, err := hcsClient.Send(&blockchain.BlockchainMessage{Msg: []byte(fmt.Sprintf("Hello HCS from Go! Message %v", 1)), Ctx: context.TODO()})
+rcpt, err := hcsClient.Send(&common.Message{Msg: []byte(fmt.Sprintf("Hello HCS from Go! Message %v", 1)), Ctx: context.TODO()})
 // if err != nil {
 // 	panic(err)
 // }
 // log.Println(rcpt.Status)
 */
 
-func (c *HCSClient) Send(msg *blockchain.BlockchainMessage) (*hedera.TransactionReceipt, error) {
+func (c *HCSClient) Send(msg *common.Message) error {
 	id, err := hedera.NewConsensusMessageSubmitTransaction().
 		SetTopicID(c.topicID).
 		SetMessage(msg.Msg).
 		Execute(c.client)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	receipt, err := id.GetReceipt(c.client)
+	_, err = id.GetReceipt(c.client)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &receipt, nil
+	return nil
 }
 
-func (c *HCSClient) Listen(receiver blockchain.BlockchainMessageReceiver) error {
+func (c *HCSClient) Listen(receiver common.MessageReceiver) error {
 	_, err := hedera.NewMirrorConsensusTopicQuery().
 		SetTopicID(c.topicID).
 		Subscribe(
 			*c.mirrorClient,
 			func(resp hedera.MirrorConsensusTopicResponse) {
-				receiver.Receive(&blockchain.BlockchainMessage{Msg: resp.Message, Ctx: context.TODO()})
+				receiver.Receive(&common.Message{Msg: resp.Message, Ctx: context.TODO()})
 			},
 			func(err error) {
 				log.Errorln(err.Error())
 			})
 
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *HCSClient) Close() error {
+	if err := c.client.Close(); err != nil {
+		return err
+	}
+
+	if err := c.mirrorClient.Close(); err != nil {
 		return err
 	}
 	return nil
@@ -82,6 +93,8 @@ func NewHCSClient(account string, key ed25519.PrivateKey, mirrorNodeAddress, top
 	if err != nil {
 		panic(err)
 	}
+
+	log.Infof("[HCS] HCS Client started with account ID: %s\n", account)
 
 	return &HCSClient{client: client, mirrorClient: &mirrorClient, topicID: hcsTopicId}
 }

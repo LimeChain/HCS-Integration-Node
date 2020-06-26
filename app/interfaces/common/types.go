@@ -1,10 +1,10 @@
-package p2p
+package common
 
 import (
 	"context"
 )
 
-type P2PMessage struct {
+type Message struct {
 	Msg []byte // The actual raw message
 
 	Ctx context.Context // Hold context variables like who has sent it if needed for the future
@@ -12,17 +12,17 @@ type P2PMessage struct {
 }
 
 type MessageReceiver interface {
-	Receive(msg *P2PMessage)
+	Receive(msg *Message)
 }
 
 type ChannelMessageHandler interface {
-	Handle(ch <-chan *P2PMessage)
+	Handle(ch <-chan *Message)
 }
 
 type Messenger interface {
-	Connect(receiver MessageReceiver) error
+	Listen(receiver MessageReceiver) error
 
-	Send(msg P2PMessage) error
+	Send(msg *Message) error
 
 	Close() error
 }
