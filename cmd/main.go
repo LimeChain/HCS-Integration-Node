@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"crypto/ed25519"
+	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/apiservices"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
 	rfpRepository "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
-	rfpRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
+	apiRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common/queue"
@@ -21,6 +22,9 @@ import (
 )
 
 func setupP2PClient(prvKey ed25519.PrivateKey, rfpRepo rfpRepository.RFPRepository) common.Messenger {
+
+	listenPort := os.Getenv("P2P_PORT")
+	peerMultiAddr := os.Getenv("PEER_ADDRESS")
 
 	// TODO get some env variables
 	// TODO add more handlers
@@ -36,7 +40,7 @@ func setupP2PClient(prvKey ed25519.PrivateKey, rfpRepo rfpRepository.RFPReposito
 
 	p2pQueue := queue.New(p2pChannel, r)
 
-	p2pClient := libp2p.NewLibP2PClient(prvKey)
+	p2pClient := libp2p.NewLibP2PClient(prvKey, listenPort, peerMultiAddr)
 
 	p2pClient.Listen(p2pQueue)
 
@@ -115,9 +119,9 @@ func main() {
 
 	a := api.NewIntegrationNodeAPI()
 
-	rfpService := apiservices.NewRFPService(rfpRepo)
+	rfpService := apiservices.NewRFPService(rfpRepo, p2pClient)
 
-	a.AddRouter("/rfp", rfpRouter.NewRFPRouter(rfpService))
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteRFP), apiRouter.NewRFPRouter(rfpService))
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)

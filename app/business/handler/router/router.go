@@ -3,7 +3,7 @@ package router
 import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 type BusinessMessageRouter struct {
@@ -23,6 +23,7 @@ func (mr *BusinessMessageRouter) Handle(ch <-chan *common.Message) {
 }
 
 func (mr *BusinessMessageRouter) handleMessage(msg *common.Message) error {
+	log.Infoln("Handling: ", string(msg.Msg))
 	// Parses event type and passes it to the correct BusinessLogicHandler based on the type
 	bMsg, err := mr.parser.Parse(msg)
 	if err != nil {
