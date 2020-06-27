@@ -9,7 +9,9 @@ import (
 	"os"
 )
 
-func getPrivateKey(keyPath string) ed25519.PrivateKey {
+func getPrivateKey() ed25519.PrivateKey {
+
+	keyPath := os.Getenv("PRIVATE_KEY_FILE")
 
 	info, err := os.Stat(keyPath)
 	if os.IsNotExist(err) {
@@ -18,7 +20,7 @@ func getPrivateKey(keyPath string) ed25519.PrivateKey {
 	if info.IsDir() {
 		panic(fmt.Errorf("The key is actually directory"))
 	}
-	pemKey, err := ioutil.ReadFile(DefaultKeyPath)
+	pemKey, err := ioutil.ReadFile(keyPath)
 	if err != nil {
 		panic(err)
 	}
