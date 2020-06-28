@@ -1,9 +1,9 @@
 package apiservices
 
 import (
-	// "context"
-	// "encoding/json"
-	// "github.com/Limechain/HCS-Integration-Node/app/business/messages"
+	"context"
+	"encoding/json"
+	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	contractModel "github.com/Limechain/HCS-Integration-Node/app/domain/contract/model"
 	contractRepo "github.com/Limechain/HCS-Integration-Node/app/domain/contract/repository"
 	contractService "github.com/Limechain/HCS-Integration-Node/app/domain/contract/service"
@@ -34,13 +34,13 @@ func (s *ContractService) SaveAndSendContract(unsignedContract *contractModel.Un
 	if err != nil {
 		return "", "", "", err
 	}
-	// p2pMsg := messages.CreateProposalMessage(proposal)
-	// p2pBytes, err := json.Marshal(p2pMsg)
-	// if err != nil {
-	// 	// TODO delete from db if cannot marshal
-	// 	return "", err
-	// }
-	// s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	p2pMsg := messages.CreateContractRequestMessage(signedContract)
+	p2pBytes, err := json.Marshal(p2pMsg)
+	if err != nil {
+		// TODO delete from db if cannot marshal
+		return "", "", "", err
+	}
+	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
 	return contractId, contractHash, contractSignature, nil
 }
 

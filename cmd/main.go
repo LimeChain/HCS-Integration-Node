@@ -8,6 +8,7 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
+	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	contractRepository "github.com/Limechain/HCS-Integration-Node/app/domain/contract/repository"
 	contractService "github.com/Limechain/HCS-Integration-Node/app/domain/contract/service"
 	proposalRepository "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/repository"
@@ -27,28 +28,38 @@ import (
 	"os"
 )
 
-func setupP2PClient(prvKey ed25519.PrivateKey, rfpRepo rfpRepository.RFPRepository, proposalRepo proposalRepository.ProposalRepository, contractRepo contractRepository.ContractsRepository) common.Messenger {
+func setupP2PClient(
+	prvKey ed25519.PrivateKey,
+	hcsClient common.Messenger,
+	rfpRepo rfpRepository.RFPRepository,
+	proposalRepo proposalRepository.ProposalRepository,
+	contractRepo contractRepository.ContractsRepository,
+	cs *contractService.ContractService) common.Messenger {
 
 	listenPort := os.Getenv("P2P_PORT")
 	peerMultiAddr := os.Getenv("PEER_ADDRESS")
+
+	p2pClient := libp2p.NewLibP2PClient(prvKey, listenPort, peerMultiAddr)
 
 	// TODO get some env variables
 	// TODO add more handlers
 	rfpHandler := handler.NewRFPHandler(rfpRepo)
 	proposalHandler := handler.NewProposalHandler(proposalRepo)
+	contractRequestHandler := handler.NewContractRequestHandler(contractRepo, cs, p2pClient)
+	contractAcceptedHandler := handler.NewContractAcceptedHandler(contractRepo, hcsClient)
 
 	var parser json.JSONBusinessMesssageParser
 
 	r := router.NewBusinessMessageRouter(&parser)
 
-	r.AddHandler(handler.P2PMessageTypeRFP, rfpHandler)
-	r.AddHandler(handler.P2PMessageTypeProposal, proposalHandler)
+	r.AddHandler(messages.P2PMessageTypeRFP, rfpHandler)
+	r.AddHandler(messages.P2PMessageTypeProposal, proposalHandler)
+	r.AddHandler(messages.P2PMessageTypeContractRequest, contractRequestHandler)
+	r.AddHandler(messages.P2PMessageTypeContractAccepted, contractAcceptedHandler)
 
 	p2pChannel := make(chan *common.Message)
 
 	p2pQueue := queue.New(p2pChannel, r)
-
-	p2pClient := libp2p.NewLibP2PClient(prvKey, listenPort, peerMultiAddr)
 
 	p2pClient.Listen(p2pQueue)
 
@@ -117,11 +128,15 @@ func main() {
 	contractRepo := contractMongo.NewContractRepositiry(db)
 	// TODO create more repos
 
+	ps := proposalService.New()
+	cs := contractService.New(prvKey, proposalRepo, ps)
+	// TODO create more services
+
 	hcsClient := setupBlockchainClient(prvKey) // Pass it to the correct services instead of logging
 
 	defer hcsClient.Close()
 
-	p2pClient := setupP2PClient(prvKey, rfpRepo, proposalRepo, contractRepo)
+	p2pClient := setupP2PClient(prvKey, hcsClient, rfpRepo, proposalRepo, contractRepo, cs)
 
 	defer p2pClient.Close()
 
@@ -132,8 +147,6 @@ func main() {
 	rfpApiService := apiservices.NewRFPService(rfpRepo, p2pClient)
 	proposalApiService := apiservices.NewProposalService(proposalRepo, p2pClient)
 
-	ps := proposalService.New()
-	cs := contractService.New(prvKey, proposalRepo, ps)
 	contractApiService := apiservices.NewContractService(contractRepo, cs, p2pClient)
 
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteRFP), apiRouter.NewRFPRouter(rfpApiService))

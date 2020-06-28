@@ -1,6 +1,8 @@
 package messages
 
-import "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/model"
+import (
+	"github.com/Limechain/HCS-Integration-Node/app/domain/rfp/model"
+)
 
 type RFPMessage struct {
 	BusinessMessage
@@ -8,5 +10,5 @@ type RFPMessage struct {
 }
 
 func CreateRFPMessage(rfp *model.RFP) *RFPMessage {
-	return &RFPMessage{BusinessMessage: BusinessMessage{Type: "rfp"}, Data: *rfp}
+	return &RFPMessage{BusinessMessage: BusinessMessage{Type: P2PMessageTypeRFP}, Data: *rfp}
 }

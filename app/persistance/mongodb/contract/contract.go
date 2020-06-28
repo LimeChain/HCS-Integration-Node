@@ -68,7 +68,7 @@ func (r *ContractRepository) Update(contract *model.Contract) error {
 	if len(contract.ContractId) == 0 {
 		return errors.New("Contract without Id cannot be updated")
 	}
-	ur, err := collection.UpdateOne(context.TODO(), bson.M{"proposalId": contract.ContractId}, contract)
+	ur, err := collection.ReplaceOne(context.TODO(), bson.M{"unsignedContract.contractId": contract.ContractId}, contract)
 	if err != nil {
 		return err
 	}

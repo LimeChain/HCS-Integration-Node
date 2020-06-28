@@ -8,7 +8,7 @@ type UnsignedContract struct {
 }
 
 type Contract struct {
-	UnsignedContract
+	UnsignedContract   `json:"unsignedContract" bson:"unsignedContract"`
 	BuyerSignature     string `json:"buyerSignature" bson:"buyerSignature"`
 	SupplierSignature  string `json:"supplierSignature" bson:"supplierSignature"`
 	BlockchainAnchored bool   `json:"blockchainAnchored" bson:"blockchainAnchored"`
