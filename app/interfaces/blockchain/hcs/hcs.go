@@ -14,14 +14,6 @@ type HCSClient struct {
 	topicID      hedera.ConsensusTopicID
 }
 
-/* Example how to use Send - will be removed when implemented
-rcpt, err := hcsClient.Send(&common.Message{Msg: []byte(fmt.Sprintf("Hello HCS from Go! Message %v", 1)), Ctx: context.TODO()})
-// if err != nil {
-// 	panic(err)
-// }
-// log.Println(rcpt.Status)
-*/
-
 func (c *HCSClient) Send(msg *common.Message) error {
 	id, err := hedera.NewConsensusMessageSubmitTransaction().
 		SetTopicID(c.topicID).
@@ -37,6 +29,9 @@ func (c *HCSClient) Send(msg *common.Message) error {
 	if err != nil {
 		return err
 	}
+
+	log.Infof("Sent message to HCS with Id :%s\n", id.String())
+
 	return nil
 }
 

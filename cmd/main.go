@@ -46,7 +46,7 @@ func setupP2PClient(
 	rfpHandler := handler.NewRFPHandler(rfpRepo)
 	proposalHandler := handler.NewProposalHandler(proposalRepo)
 	contractRequestHandler := handler.NewContractRequestHandler(contractRepo, cs, p2pClient)
-	contractAcceptedHandler := handler.NewContractAcceptedHandler(contractRepo, hcsClient)
+	contractAcceptedHandler := handler.NewContractAcceptedHandler(contractRepo, cs, hcsClient)
 
 	var parser json.JSONBusinessMesssageParser
 

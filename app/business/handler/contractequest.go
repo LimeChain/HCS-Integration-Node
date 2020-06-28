@@ -33,6 +33,8 @@ func (h *ContractRequestHandler) Handle(msg *common.Message) error {
 		return errors.New("The contract was not signed by the buyer")
 	}
 
+	// TODO check the buyer signature is valid
+
 	contractSignature, err := h.contractsService.Sign(&contract.UnsignedContract)
 	if err != nil {
 		return err

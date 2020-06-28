@@ -5,11 +5,6 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 )
 
-const (
-	BlockchainMessageTypeContract = "contract"
-	BlockchainMessageTypePO       = "po"
-)
-
 type BusinessMessageParser interface {
 	Parse(msg *common.Message) (*messages.BusinessMessage, error)
 }

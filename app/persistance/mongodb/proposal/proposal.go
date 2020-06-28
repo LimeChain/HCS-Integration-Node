@@ -2,7 +2,6 @@ package proposal
 
 import (
 	"context"
-	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/proposal/model"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -45,7 +44,6 @@ func (r *ProposalRepository) GetByID(id string) (*model.Proposal, error) {
 		return nil, err
 	}
 
-	fmt.Println(result)
 	return &result, nil
 }
 func (r *ProposalRepository) Save(rfp *model.Proposal) (string, error) {

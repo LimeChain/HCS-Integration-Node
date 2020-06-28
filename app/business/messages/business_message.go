@@ -11,3 +11,8 @@ const (
 	P2PMessageTypeContractAccepted = "contractaccepted"
 	P2PMessageTypePO               = "po"
 )
+
+const (
+	BlockchainMessageTypeContract = "contract"
+	BlockchainMessageTypePO       = "po"
+)

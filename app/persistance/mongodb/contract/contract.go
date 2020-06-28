@@ -3,7 +3,6 @@ package contract
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/contract/model"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -46,7 +45,6 @@ func (r *ContractRepository) GetByID(id string) (*model.Contract, error) {
 		return nil, err
 	}
 
-	fmt.Println(result)
 	return &result, nil
 }
 
