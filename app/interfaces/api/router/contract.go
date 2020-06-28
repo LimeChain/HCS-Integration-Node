@@ -19,10 +19,10 @@ type SendContractRequest struct {
 	ReferencedProposalId string `json:"referencedProposalId" bson:"referencedProposalId"`
 }
 
-// type storedProposalsResponse struct {
-// 	api.IntegrationNodeAPIResponse
-// 	Proposals []*proposalModel.Proposal `json:"proposals"`
-// }
+type storedContractsResponse struct {
+	api.IntegrationNodeAPIResponse
+	Contracts []*contractModel.Contract `json:"contracts"`
+}
 
 type sendContractResponse struct {
 	api.IntegrationNodeAPIResponse
@@ -40,16 +40,16 @@ func (req *SendContractRequest) toUnsignedContract() *contractModel.UnsignedCont
 	}
 }
 
-// func getAllStoredProposals(proposalService *apiservices.ProposalService) func(w http.ResponseWriter, r *http.Request) {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		storedProposals, err := proposalService.GetAllProposals()
-// 		if err != nil {
-// 			render.JSON(w, r, storedProposalsResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
-// 			return
-// 		}
-// 		render.JSON(w, r, storedProposalsResponse{api.IntegrationNodeAPIResponse{Status: true, Error: ""}, storedProposals})
-// 	}
-// }
+func getAllStoredContracts(contractsService *apiservices.ContractService) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		storedContracts, err := contractsService.GetAllContracts()
+		if err != nil {
+			render.JSON(w, r, storedContractsResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
+			return
+		}
+		render.JSON(w, r, storedContractsResponse{api.IntegrationNodeAPIResponse{Status: true, Error: ""}, storedContracts})
+	}
+}
 
 func sendContract(contractsService *apiservices.ContractService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +90,7 @@ func sendContract(contractsService *apiservices.ContractService) func(w http.Res
 
 func NewContractsRouter(contractsService *apiservices.ContractService) http.Handler {
 	r := chi.NewRouter()
-	// r.Get("/", getAllStoredProposals(proposalService))
+	r.Get("/", getAllStoredContracts(contractsService))
 	r.Post("/", sendContract(contractsService))
 	return r
 }
