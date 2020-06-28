@@ -8,7 +8,10 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/router"
+	contractRepository "github.com/Limechain/HCS-Integration-Node/app/domain/contract/repository"
+	contractService "github.com/Limechain/HCS-Integration-Node/app/domain/contract/service"
 	proposalRepository "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/repository"
+	proposalService "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/service"
 	rfpRepository "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
 	apiRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
@@ -16,6 +19,7 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common/queue"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
+	contractMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/contract"
 	proposalMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/proposal"
 	rfpMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	"github.com/joho/godotenv"
@@ -23,7 +27,7 @@ import (
 	"os"
 )
 
-func setupP2PClient(prvKey ed25519.PrivateKey, rfpRepo rfpRepository.RFPRepository, proposalRepo proposalRepository.ProposalRepository) common.Messenger {
+func setupP2PClient(prvKey ed25519.PrivateKey, rfpRepo rfpRepository.RFPRepository, proposalRepo proposalRepository.ProposalRepository, contractRepo contractRepository.ContractsRepository) common.Messenger {
 
 	listenPort := os.Getenv("P2P_PORT")
 	peerMultiAddr := os.Getenv("PEER_ADDRESS")
@@ -110,13 +114,14 @@ func main() {
 
 	rfpRepo := rfpMongo.NewRFPRepository(db)
 	proposalRepo := proposalMongo.NewProposalRepository(db)
+	contractRepo := contractMongo.NewContractRepositiry(db)
 	// TODO create more repos
 
 	hcsClient := setupBlockchainClient(prvKey) // Pass it to the correct services instead of logging
 
 	defer hcsClient.Close()
 
-	p2pClient := setupP2PClient(prvKey, rfpRepo, proposalRepo)
+	p2pClient := setupP2PClient(prvKey, rfpRepo, proposalRepo, contractRepo)
 
 	defer p2pClient.Close()
 
@@ -124,11 +129,16 @@ func main() {
 
 	a := api.NewIntegrationNodeAPI()
 
-	rfpService := apiservices.NewRFPService(rfpRepo, p2pClient)
-	proposalService := apiservices.NewProposalService(proposalRepo, p2pClient)
+	rfpApiService := apiservices.NewRFPService(rfpRepo, p2pClient)
+	proposalApiService := apiservices.NewProposalService(proposalRepo, p2pClient)
 
-	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteRFP), apiRouter.NewRFPRouter(rfpService))
-	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteProposal), apiRouter.NewProposalsRouter(proposalService))
+	ps := proposalService.New()
+	cs := contractService.New(prvKey, proposalRepo, ps)
+	contractApiService := apiservices.NewContractService(contractRepo, cs, p2pClient)
+
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteRFP), apiRouter.NewRFPRouter(rfpApiService))
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteProposal), apiRouter.NewProposalsRouter(proposalApiService))
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteContract), apiRouter.NewContractsRouter(contractApiService))
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)

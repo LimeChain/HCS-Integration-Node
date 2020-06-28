@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/ed25519"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/contract/model"
 	proposalRepo "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/repository"
@@ -12,7 +13,7 @@ import (
 
 type ContractService struct {
 	pr         proposalRepo.ProposalRepository
-	ps         proposalService.ProposalService
+	ps         *proposalService.ProposalService
 	signingKey ed25519.PrivateKey
 }
 
@@ -46,9 +47,10 @@ func (s *ContractService) Sign(c *model.UnsignedContract) (string, error) {
 	}
 
 	signature := ed25519.Sign(s.signingKey, []byte(contractHash))
-	return string(signature), nil
+	signatureStr := hex.EncodeToString(signature)
+	return signatureStr, nil
 }
 
-func New(signingKey ed25519.PrivateKey, pr proposalRepo.ProposalRepository, ps proposalService.ProposalService) *ContractService {
+func New(signingKey ed25519.PrivateKey, pr proposalRepo.ProposalRepository, ps *proposalService.ProposalService) *ContractService {
 	return &ContractService{signingKey: signingKey, pr: pr, ps: ps}
 }
