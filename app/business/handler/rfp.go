@@ -13,7 +13,7 @@ type RFPHandler struct {
 }
 
 func (h *RFPHandler) Handle(msg *common.Message) error {
-	log.Infoln("Handling: ", string(msg.Msg))
+
 	var rfpMsg messages.RFPMessage
 	err := json.Unmarshal(msg.Msg, &rfpMsg)
 	if err != nil {
