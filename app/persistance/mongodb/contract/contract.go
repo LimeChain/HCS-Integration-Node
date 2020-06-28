@@ -41,7 +41,7 @@ func (r *ContractRepository) GetByID(id string) (*model.Contract, error) {
 
 	var result model.Contract
 	collection := r.db.Collection("contracts")
-	if err := collection.FindOne(context.TODO(), bson.M{"proposalId": id}).Decode(&result); err != nil {
+	if err := collection.FindOne(context.TODO(), bson.M{"unsignedContract.contractId": id}).Decode(&result); err != nil {
 		return nil, err
 	}
 

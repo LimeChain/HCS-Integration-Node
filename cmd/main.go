@@ -66,7 +66,10 @@ func setupP2PClient(
 	return p2pClient
 }
 
-func setupBlockchainClient(prvKey ed25519.PrivateKey) common.Messenger {
+func setupBlockchainClient(
+	prvKey ed25519.PrivateKey,
+	contractRepo contractRepository.ContractsRepository,
+	cs *contractService.ContractService) common.Messenger {
 
 	hcsClientID := os.Getenv("HCS_CLIENT_ID")
 	hcsMirrorNodeID := os.Getenv("HCS_MIRROR_NODE_ADDRESS")
@@ -76,7 +79,11 @@ func setupBlockchainClient(prvKey ed25519.PrivateKey) common.Messenger {
 
 	r := router.NewBusinessMessageRouter(&parser)
 
+	contractHandler := handler.NewBlockchainContractHandler(contractRepo, cs)
+
 	// TODO add handlers
+
+	r.AddHandler(messages.BlockchainMessageTypeContract, contractHandler)
 
 	ch := make(chan *common.Message)
 
@@ -132,7 +139,7 @@ func main() {
 	cs := contractService.New(prvKey, proposalRepo, ps)
 	// TODO create more services
 
-	hcsClient := setupBlockchainClient(prvKey) // Pass it to the correct services instead of logging
+	hcsClient := setupBlockchainClient(prvKey, contractRepo, cs)
 
 	defer hcsClient.Close()
 

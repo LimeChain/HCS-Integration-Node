@@ -8,6 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const SequenceNumberKey = "SequenceNumber"
+
 type HCSClient struct {
 	client       *hedera.Client
 	mirrorClient *hedera.MirrorClient
@@ -41,7 +43,8 @@ func (c *HCSClient) Listen(receiver common.MessageReceiver) error {
 		Subscribe(
 			*c.mirrorClient,
 			func(resp hedera.MirrorConsensusTopicResponse) {
-				receiver.Receive(&common.Message{Msg: resp.Message, Ctx: context.TODO()})
+				ctx := context.WithValue(context.Background(), SequenceNumberKey, resp.SequenceNumber)
+				receiver.Receive(&common.Message{Msg: resp.Message, Ctx: ctx})
 			},
 			func(err error) {
 				log.Errorln(err.Error())

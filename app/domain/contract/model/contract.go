@@ -12,4 +12,5 @@ type Contract struct {
 	BuyerSignature     string `json:"buyerSignature" bson:"buyerSignature"`
 	SupplierSignature  string `json:"supplierSignature" bson:"supplierSignature"`
 	BlockchainAnchored bool   `json:"blockchainAnchored" bson:"blockchainAnchored"`
+	BlockchainProof    string `json:"blockchainProof" bson:"blockchainProof"`
 }
