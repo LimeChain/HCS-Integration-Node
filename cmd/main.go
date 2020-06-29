@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/ed25519"
+	"encoding/hex"
 	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/apiservices"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
@@ -126,6 +127,15 @@ func main() {
 
 	prvKey := getPrivateKey()
 
+	pubKey, ok := prvKey.Public().(ed25519.PublicKey)
+	if !ok {
+		log.Errorf("Could not cast the public key to ed25519 public key")
+	}
+
+	log.Infof("Started node with public key: %s\n", hex.EncodeToString(pubKey))
+
+	peerPubKey := getPeerPublicKey()
+
 	client, db := connectToDb()
 
 	defer client.Disconnect(context.Background())
@@ -136,7 +146,7 @@ func main() {
 	// TODO create more repos
 
 	ps := proposalService.New()
-	cs := contractService.New(prvKey, proposalRepo, ps)
+	cs := contractService.New(prvKey, proposalRepo, ps, peerPubKey)
 	// TODO create more services
 
 	hcsClient := setupBlockchainClient(prvKey, contractRepo, cs)

@@ -12,10 +12,14 @@ import (
 )
 
 func generateEd25519Keypair() ed25519.PrivateKey {
-	_, priv, err := ed25519.GenerateKey(nil)
+	pub, priv, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		panic(err)
 	}
+
+	pubKeyString := fmt.Sprintf("%x", pub)
+
+	fmt.Printf("Ed25519 public key: %s\n", pubKeyString)
 
 	return priv
 }

@@ -37,12 +37,28 @@ func (h *ContractAcceptedHandler) Handle(msg *common.Message) error {
 		return errors.New("The contract was not signed by the supplir")
 	}
 
+	savedContract, err := h.contractsRepo.GetByID(contract.ContractId)
+	if err != nil {
+		return err
+	}
+
+	if savedContract.BuyerSignature != contract.BuyerSignature {
+		return errors.New("The contract buyer signature was not the one storred. The supplier has tried to cheat you")
+	}
+
 	contractHash, err := h.contractService.Hash(&contract.UnsignedContract)
 	if err != nil {
 		return err
 	}
 
-	// TODO check the supplier signature is valid
+	signatureCorrect, err := h.contractService.VerifySupplier(&contract)
+	if err != nil {
+		return err
+	}
+
+	if !signatureCorrect {
+		return errors.New("Invalid signature by the supplier")
+	}
 
 	blockchainMessage := messages.CreateBlockchainContractMessage(contract.ContractId, contractHash, contract.BuyerSignature, contract.SupplierSignature)
 
@@ -62,7 +78,7 @@ func (h *ContractAcceptedHandler) Handle(msg *common.Message) error {
 		return err
 	}
 
-	log.Infof("Saved accepted contract with id: %s\n", contract.ContractId)
+	log.Infof("Verified and saved accepted contract with id: %s\n", contract.ContractId)
 	return nil
 }
 
