@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/ed25519"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"github.com/hashgraph/hedera-sdk-go"
@@ -17,9 +18,8 @@ func generateEd25519Keypair() ed25519.PrivateKey {
 		panic(err)
 	}
 
-	pubKeyString := fmt.Sprintf("%x", pub)
-
-	fmt.Printf("Ed25519 public key: %s\n", pubKeyString)
+	pubKeyString := hex.EncodeToString(pub)
+	fmt.Printf("Ed25519 public key hex: %s\n", pubKeyString)
 
 	return priv
 }
