@@ -12,6 +12,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/libp2p/go-libp2p v0.10.0
 	github.com/libp2p/go-libp2p-core v0.6.0
+	github.com/multiformats/go-multiaddr v0.2.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.6.1
 	go.mongodb.org/mongo-driver v1.3.4
