@@ -3,11 +3,27 @@ package main
 import (
 	"crypto/ed25519"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 )
+
+func getPeerPublicKey() ed25519.PublicKey {
+	peerPubKeyHex := os.Getenv("PEER_PUB_KEY")
+	if len(peerPubKeyHex) == 0 {
+		log.Panic("No peer pub key supplied")
+	}
+
+	peerPubKeyString, err := hex.DecodeString(peerPubKeyHex)
+	if err != nil {
+		panic(err)
+	}
+
+	return ed25519.PublicKey(peerPubKeyString)
+}
 
 func getPrivateKey() ed25519.PrivateKey {
 

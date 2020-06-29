@@ -12,9 +12,9 @@ import (
 )
 
 type ContractRequestHandler struct {
-	contractsRepo    repository.ContractsRepository
-	contractsService *service.ContractService
-	p2pClient        common.Messenger
+	contractsRepo   repository.ContractsRepository
+	contractService *service.ContractService
+	p2pClient       common.Messenger
 }
 
 func (h *ContractRequestHandler) Handle(msg *common.Message) error {
@@ -33,9 +33,16 @@ func (h *ContractRequestHandler) Handle(msg *common.Message) error {
 		return errors.New("The contract was not signed by the buyer")
 	}
 
-	// TODO check the buyer signature is valid
+	signatureCorrect, err := h.contractService.VerifyBuyer(&contract)
+	if err != nil {
+		return err
+	}
 
-	contractSignature, err := h.contractsService.Sign(&contract.UnsignedContract)
+	if !signatureCorrect {
+		return errors.New("Invalid signature by the buyer")
+	}
+
+	contractSignature, err := h.contractService.Sign(&contract.UnsignedContract)
 	if err != nil {
 		return err
 	}
@@ -56,10 +63,13 @@ func (h *ContractRequestHandler) Handle(msg *common.Message) error {
 	}
 	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
 
-	log.Infof("Saved contract with id: %s\n", contractId)
+	log.Infof("Verified and saved contract with id: %s\n", contractId)
 	return nil
 }
 
-func NewContractRequestHandler(contractsRepo repository.ContractsRepository, contractsService *service.ContractService, p2pClient common.Messenger) *ContractRequestHandler {
-	return &ContractRequestHandler{contractsRepo: contractsRepo, contractsService: contractsService, p2pClient: p2pClient}
+func NewContractRequestHandler(
+	contractsRepo repository.ContractsRepository,
+	contractService *service.ContractService,
+	p2pClient common.Messenger) *ContractRequestHandler {
+	return &ContractRequestHandler{contractsRepo: contractsRepo, contractService: contractService, p2pClient: p2pClient}
 }

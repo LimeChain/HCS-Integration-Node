@@ -17,7 +17,7 @@ func (mr *BusinessMessageRouter) Handle(ch <-chan *common.Message) {
 	// Waits for event
 	for msg := range ch {
 		if err := mr.handleMessage(msg); err != nil {
-			log.Println(err.Error())
+			log.Errorln(err.Error())
 		}
 	}
 }

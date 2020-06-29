@@ -13,8 +13,8 @@ import (
 )
 
 type BlockchainContractHandler struct {
-	contractsRepo    repository.ContractsRepository
-	contractsService *service.ContractService
+	contractsRepo   repository.ContractsRepository
+	contractService *service.ContractService
 }
 
 func (h *BlockchainContractHandler) Handle(msg *common.Message) error {
@@ -50,7 +50,7 @@ func (h *BlockchainContractHandler) Handle(msg *common.Message) error {
 		return errors.New("The contract supplier signature was not the one storred")
 	}
 
-	savedHash, err := h.contractsService.Hash(&savedContract.UnsignedContract)
+	savedHash, err := h.contractService.Hash(&savedContract.UnsignedContract)
 	if err != nil {
 		return err
 	}
@@ -58,8 +58,6 @@ func (h *BlockchainContractHandler) Handle(msg *common.Message) error {
 	if savedHash != contract.ContractHash {
 		return errors.New("The contract hash was not the one storred")
 	}
-
-	// TODO check the signatures validity ed25519.Verify
 
 	sn := msg.Ctx.Value(hcs.SequenceNumberKey)
 
@@ -76,10 +74,10 @@ func (h *BlockchainContractHandler) Handle(msg *common.Message) error {
 		return err
 	}
 
-	log.Infof("Contract with Id: %s seen in the blockchain\n", contract.ContractId)
+	log.Infof("Contract with Id: %s seen in the blockchain and verified\n", contract.ContractId)
 	return nil
 }
 
-func NewBlockchainContractHandler(contractsRepo repository.ContractsRepository, contractsService *service.ContractService) *BlockchainContractHandler {
-	return &BlockchainContractHandler{contractsRepo: contractsRepo, contractsService: contractsService}
+func NewBlockchainContractHandler(contractsRepo repository.ContractsRepository, contractService *service.ContractService) *BlockchainContractHandler {
+	return &BlockchainContractHandler{contractsRepo: contractsRepo, contractService: contractService}
 }
