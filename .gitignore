@@ -1,5 +1,7 @@
 gomon_spawn
 .env
-config/key.pem
+peer*.env
+config/key*
+!config/key.pem.example
 *.log
 .idea

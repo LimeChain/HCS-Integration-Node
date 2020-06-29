@@ -15,12 +15,10 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common/queue"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	rfpPersistance "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
-
-const DefaultKeyPath = "./config/key.pem"
 
 func setupP2PClient(prvKey ed25519.PrivateKey, rfpRepo rfpRepository.RFPRepository) common.Messenger {
 
@@ -74,6 +72,13 @@ func setupBlockchainClient(prvKey ed25519.PrivateKey) common.Messenger {
 
 func main() {
 
+	args := os.Args[1:]
+	if len(args) > 0 {
+		godotenv.Load(args[0])
+	} else {
+		godotenv.Load()
+	}
+
 	logFilePath := os.Getenv("LOG_FILE")
 
 	setupLogger()
@@ -89,7 +94,7 @@ func main() {
 		setupFileLogger(file)
 	}
 
-	prvKey := getPrivateKey(DefaultKeyPath)
+	prvKey := getPrivateKey()
 
 	client, db := connectToDb()
 

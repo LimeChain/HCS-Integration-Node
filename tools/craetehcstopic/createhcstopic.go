@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func createTestnetTopic(a, b hedera.Ed25519PublicKey) hedera.ConsensusTopicID {
+func createTestnetTopic() hedera.ConsensusTopicID {
 	operatorAccountID, err := hedera.AccountIDFromString(os.Getenv("HCS_OPERATOR_ID"))
 	if err != nil {
 		panic(err)
@@ -23,8 +23,6 @@ func createTestnetTopic(a, b hedera.Ed25519PublicKey) hedera.ConsensusTopicID {
 
 	transactionID, err := hedera.NewConsensusTopicCreateTransaction().
 		SetAdminKey(operatorPrivateKey.PublicKey()).
-		// SetSubmitKey(a).
-		// SetSubmitKey(b).
 		SetAutoRenewAccountID(operatorAccountID).
 		Execute(client)
 
@@ -46,20 +44,20 @@ func createTestnetTopic(a, b hedera.Ed25519PublicKey) hedera.ConsensusTopicID {
 
 func main() {
 
-	a := os.Getenv("A_PUB_KEY")
-	b := os.Getenv("B_PUB_KEY")
+	// a := os.Getenv("A_PUB_KEY")
+	// b := os.Getenv("B_PUB_KEY")
 
-	aPubKey, err := hedera.Ed25519PublicKeyFromString(a)
-	if err != nil {
-		panic(err)
-	}
+	// aPubKey, err := hedera.Ed25519PublicKeyFromString(a)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	bPubKey, err := hedera.Ed25519PublicKeyFromString(b)
-	if err != nil {
-		panic(err)
-	}
+	// bPubKey, err := hedera.Ed25519PublicKeyFromString(b)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	topicID := createTestnetTopic(aPubKey, bPubKey)
+	topicID := createTestnetTopic()
 
 	fmt.Printf("topicID: %v\n", topicID)
 
