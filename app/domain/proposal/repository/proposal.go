@@ -2,6 +2,8 @@ package repository
 
 import "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/model"
 
-type RFPRepository interface {
-	Save(*model.Proposal) error
+type ProposalRepository interface {
+	GetAll() ([]*model.Proposal, error)
+	GetByID(id string) (*model.Proposal, error)
+	Save(*model.Proposal) (id string, err error)
 }
