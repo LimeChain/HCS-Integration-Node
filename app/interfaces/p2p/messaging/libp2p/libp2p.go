@@ -13,7 +13,6 @@ import (
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 const p2pStreamName = "/hcs-int-p2p-nodes/1.0.0"
@@ -58,23 +57,6 @@ func (c *LibP2PClient) Send(msg *common.Message) error {
 
 func (c *LibP2PClient) Close() error {
 	return nil
-}
-
-func writeData(messagesReadWriter *bufio.ReadWriter) {
-	stdReader := bufio.NewReader(os.Stdin)
-
-	for {
-		fmt.Print("> ")
-		sendData, err := stdReader.ReadString('\n')
-
-		if err != nil {
-			panic(err)
-		}
-
-		messagesReadWriter.WriteString(fmt.Sprintf("%s\n", sendData))
-		messagesReadWriter.Flush()
-	}
-
 }
 
 func NewLibP2PClient(key ed25519.PrivateKey, listenPort, peerMultiAddr string) *LibP2PClient {

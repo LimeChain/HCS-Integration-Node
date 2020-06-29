@@ -2,7 +2,6 @@ package rfp
 
 import (
 	"context"
-	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/rfp/model"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ func (r *RFPRepository) GetAll() ([]*model.RFP, error) {
 		return nil, err
 	}
 
-	results := make( []*model.RFP, 0)
+	results := make([]*model.RFP, 0)
 
 	for cur.Next(context.TODO()) {
 
@@ -45,7 +44,6 @@ func (r *RFPRepository) GetByID(id string) (*model.RFP, error) {
 		return nil, err
 	}
 
-	fmt.Println(result)
 	return &result, nil
 }
 func (r *RFPRepository) Save(rfp *model.RFP) (string, error) {

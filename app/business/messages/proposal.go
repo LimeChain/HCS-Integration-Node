@@ -8,5 +8,5 @@ type ProposalMessage struct {
 }
 
 func CreateProposalMessage(proposal *model.Proposal) *ProposalMessage {
-	return &ProposalMessage{BusinessMessage: BusinessMessage{Type: "proposal"}, Data: *proposal}
+	return &ProposalMessage{BusinessMessage: BusinessMessage{Type: P2PMessageTypeProposal}, Data: *proposal}
 }

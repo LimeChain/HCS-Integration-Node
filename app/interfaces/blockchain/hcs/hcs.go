@@ -8,19 +8,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const SequenceNumberKey = "SequenceNumber"
+
 type HCSClient struct {
 	client       *hedera.Client
 	mirrorClient *hedera.MirrorClient
 	topicID      hedera.ConsensusTopicID
 }
-
-/* Example how to use Send - will be removed when implemented
-rcpt, err := hcsClient.Send(&common.Message{Msg: []byte(fmt.Sprintf("Hello HCS from Go! Message %v", 1)), Ctx: context.TODO()})
-// if err != nil {
-// 	panic(err)
-// }
-// log.Println(rcpt.Status)
-*/
 
 func (c *HCSClient) Send(msg *common.Message) error {
 	id, err := hedera.NewConsensusMessageSubmitTransaction().
@@ -37,6 +31,9 @@ func (c *HCSClient) Send(msg *common.Message) error {
 	if err != nil {
 		return err
 	}
+
+	log.Infof("Sent message to HCS with Id :%s\n", id.String())
+
 	return nil
 }
 
@@ -46,7 +43,8 @@ func (c *HCSClient) Listen(receiver common.MessageReceiver) error {
 		Subscribe(
 			*c.mirrorClient,
 			func(resp hedera.MirrorConsensusTopicResponse) {
-				receiver.Receive(&common.Message{Msg: resp.Message, Ctx: context.TODO()})
+				ctx := context.WithValue(context.Background(), SequenceNumberKey, resp.SequenceNumber)
+				receiver.Receive(&common.Message{Msg: resp.Message, Ctx: ctx})
 			},
 			func(err error) {
 				log.Errorln(err.Error())
