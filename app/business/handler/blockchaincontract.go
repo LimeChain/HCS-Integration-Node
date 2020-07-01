@@ -61,13 +61,13 @@ func (h *BlockchainContractHandler) Handle(msg *common.Message) error {
 
 	sn := msg.Ctx.Value(hcs.SequenceNumberKey)
 
-	squenceNumber, ok := sn.(uint64)
+	sequenceNumber, ok := sn.(uint64)
 	if !ok {
 		return errors.New("Could not get the proof sequence number")
 	}
 
 	savedContract.BlockchainAnchored = true
-	savedContract.BlockchainProof = fmt.Sprintf("%d", squenceNumber)
+	savedContract.BlockchainProof = fmt.Sprintf("%d", sequenceNumber)
 
 	err = h.contractsRepo.Update(savedContract)
 	if err != nil {

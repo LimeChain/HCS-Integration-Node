@@ -9,7 +9,8 @@ const (
 	P2PMessageTypeProposal         = "proposal"
 	P2PMessageTypeContractRequest  = "contractrequest"
 	P2PMessageTypeContractAccepted = "contractaccepted"
-	P2PMessageTypePO               = "po"
+	P2PMessageTypePORequest        = "porequest"
+	P2PMessageTypePOAccepted        = "poaccepted"
 )
 
 const (
