@@ -12,8 +12,8 @@ import (
 )
 
 type PurchaseOrderService struct {
-	cr contractRepo.ContractsRepository
-	cs *contractService.ContractService
+	cr         contractRepo.ContractsRepository
+	cs         *contractService.ContractService
 	signingKey ed25519.PrivateKey
 	peerPubKey ed25519.PublicKey
 }
@@ -73,5 +73,5 @@ func (s *PurchaseOrderService) VerifySupplier(po *model.PurchaseOrder) (bool, er
 }
 
 func New(signingKey ed25519.PrivateKey, cr contractRepo.ContractsRepository, cs *contractService.ContractService, peerPubKey ed25519.PublicKey) *PurchaseOrderService {
-	return &PurchaseOrderService{signingKey: signingKey, cr: cr, cs : cs, peerPubKey: peerPubKey}
+	return &PurchaseOrderService{signingKey: signingKey, cr: cr, cs: cs, peerPubKey: peerPubKey}
 }

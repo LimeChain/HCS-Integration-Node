@@ -14,8 +14,8 @@ import (
 	contractService "github.com/Limechain/HCS-Integration-Node/app/domain/contract/service"
 	proposalRepository "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/repository"
 	proposalService "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/service"
-	poService "github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/service"
 	poRepository "github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/repository"
+	poService "github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/service"
 	rfpRepository "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
 	apiRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
@@ -25,8 +25,8 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	contractMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/contract"
 	proposalMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/proposal"
-	rfpMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	poMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/purchase-order"
+	rfpMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -40,7 +40,7 @@ func setupP2PClient(
 	contractRepo contractRepository.ContractsRepository,
 	cs *contractService.ContractService,
 	por poRepository.PurchaseOrdersRepository,
-	pos *poService.PurchaseOrderService,) common.Messenger {
+	pos *poService.PurchaseOrderService) common.Messenger {
 
 	listenPort := os.Getenv("P2P_PORT")
 	peerMultiAddr := os.Getenv("PEER_ADDRESS")

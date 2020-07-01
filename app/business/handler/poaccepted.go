@@ -12,9 +12,9 @@ import (
 )
 
 type PurchaseOrderAcceptedHandler struct {
-	por  repository.PurchaseOrdersRepository
+	por              repository.PurchaseOrdersRepository
 	blockchainClient common.Messenger
-	pos  *service.PurchaseOrderService
+	pos              *service.PurchaseOrderService
 }
 
 func (h *PurchaseOrderAcceptedHandler) Handle(msg *common.Message) error {

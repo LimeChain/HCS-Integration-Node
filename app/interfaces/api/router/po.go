@@ -13,11 +13,11 @@ import (
 )
 
 type SendPurchaseOrderRequest struct {
-	PurchaseOrderId           	string `json:"purchaseOrderId" bson:"purchaseOrderId"`
-	SupplierId           		string `json:"supplierId" bson:"supplierId"`
-	BuyerId              		string `json:"buyerId" bson:"buyerId"`
-	ReferencedContractId 		string `json:"referencedContractId" bson:"referencedContractId"`
-	Items      					[]requestOrderItem `json:"items" bson:"items"`
+	PurchaseOrderId      string             `json:"purchaseOrderId" bson:"purchaseOrderId"`
+	SupplierId           string             `json:"supplierId" bson:"supplierId"`
+	BuyerId              string             `json:"buyerId" bson:"buyerId"`
+	ReferencedContractId string             `json:"referencedContractId" bson:"referencedContractId"`
+	Items                []requestOrderItem `json:"items" bson:"items"`
 }
 
 type requestOrderItem struct {
@@ -64,7 +64,7 @@ func (req *SendPurchaseOrderRequest) toUnsignedPurchaseOrder() *purchaseOrderMod
 		SupplierId:           req.SupplierId,
 		BuyerId:              req.BuyerId,
 		ReferencedContractId: req.ReferencedContractId,
-		OrderItems: 		  items,
+		OrderItems:           items,
 	}
 }
 
@@ -109,9 +109,9 @@ func sendPO(poService *apiservices.PurchaseOrderService) func(w http.ResponseWri
 
 		render.JSON(w, r, sendPOResponse{
 			IntegrationNodeAPIResponse: api.IntegrationNodeAPIResponse{Status: true, Error: ""},
-			PurchaseOrderId:                 purchaseOrderId,
-			PurchaseOrderHash:               purchaseOrderHash,
-			PurchaseOrderSignature:          purchaseOrderSignature,
+			PurchaseOrderId:            purchaseOrderId,
+			PurchaseOrderHash:          purchaseOrderHash,
+			PurchaseOrderSignature:     purchaseOrderSignature,
 		})
 	}
 }

@@ -13,7 +13,7 @@ import (
 )
 
 type BlockchainPOHandler struct {
-	por   repository.PurchaseOrdersRepository
+	por repository.PurchaseOrdersRepository
 	pos *service.PurchaseOrderService
 }
 

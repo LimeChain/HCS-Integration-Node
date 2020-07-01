@@ -16,8 +16,8 @@ func CreateBlockchainPOMessage(purchaseOrderId, purchaseOrderHash, buyerSignatur
 	return &BlockchainPOMessage{
 		BusinessMessage: BusinessMessage{Type: BlockchainMessageTypePO},
 		Data: blockchainPO{
-			PurchaseOrderId:        purchaseOrderId,
-			PurchaseOrderHash:      purchaseOrderHash,
+			PurchaseOrderId:   purchaseOrderId,
+			PurchaseOrderHash: purchaseOrderHash,
 			BuyerSignature:    buyerSignature,
 			SupplierSignature: supplierSignature,
 		},

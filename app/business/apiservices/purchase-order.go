@@ -11,8 +11,8 @@ import (
 )
 
 type PurchaseOrderService struct {
-	por        poRepo.PurchaseOrdersRepository
-	pos        *poService.PurchaseOrderService
+	por       poRepo.PurchaseOrdersRepository
+	pos       *poService.PurchaseOrderService
 	p2pClient common.Messenger
 }
 
