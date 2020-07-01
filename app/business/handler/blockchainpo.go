@@ -3,9 +3,11 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/service"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	log "github.com/sirupsen/logrus"
 )
@@ -53,11 +55,19 @@ func (h *BlockchainPOHandler) Handle(msg *common.Message) error {
 		return err
 	}
 
+	sn := msg.Ctx.Value(hcs.SequenceNumberKey)
+
+	sequenceNumber, ok := sn.(uint64)
+	if !ok {
+		return errors.New("Could not get the proof sequence number")
+	}
+
 	if savedHash != po.PurchaseOrderHash {
 		return errors.New("The po hash was not the one storred")
 	}
 
 	savedPO.BlockchainAnchored = true
+	savedPO.BlockchainProof = fmt.Sprintf("%d", sequenceNumber)
 
 	err = h.por.Update(savedPO)
 	if err != nil {
