@@ -5,3 +5,4 @@ config/key*
 !config/key.pem.example
 *.log
 .idea
+**/.DS_store
