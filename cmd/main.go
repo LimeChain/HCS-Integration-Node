@@ -14,6 +14,8 @@ import (
 	contractService "github.com/Limechain/HCS-Integration-Node/app/domain/contract/service"
 	proposalRepository "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/repository"
 	proposalService "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/service"
+	poRepository "github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/repository"
+	poService "github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/service"
 	rfpRepository "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
 	apiRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
@@ -23,6 +25,7 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	contractMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/contract"
 	proposalMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/proposal"
+	poMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/purchase-order"
 	rfpMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
@@ -35,7 +38,9 @@ func setupP2PClient(
 	rfpRepo rfpRepository.RFPRepository,
 	proposalRepo proposalRepository.ProposalRepository,
 	contractRepo contractRepository.ContractsRepository,
-	cs *contractService.ContractService) common.Messenger {
+	cs *contractService.ContractService,
+	por poRepository.PurchaseOrdersRepository,
+	pos *poService.PurchaseOrderService) common.Messenger {
 
 	listenPort := os.Getenv("P2P_PORT")
 	peerMultiAddr := os.Getenv("PEER_ADDRESS")
@@ -48,6 +53,8 @@ func setupP2PClient(
 	proposalHandler := handler.NewProposalHandler(proposalRepo)
 	contractRequestHandler := handler.NewContractRequestHandler(contractRepo, cs, p2pClient)
 	contractAcceptedHandler := handler.NewContractAcceptedHandler(contractRepo, cs, hcsClient)
+	poRequestHandler := handler.NewPORequestHandler(por, pos, p2pClient)
+	poAcceptedHandler := handler.NewPOAcceptedHandler(por, pos, hcsClient)
 
 	var parser json.JSONBusinessMesssageParser
 
@@ -57,6 +64,8 @@ func setupP2PClient(
 	r.AddHandler(messages.P2PMessageTypeProposal, proposalHandler)
 	r.AddHandler(messages.P2PMessageTypeContractRequest, contractRequestHandler)
 	r.AddHandler(messages.P2PMessageTypeContractAccepted, contractAcceptedHandler)
+	r.AddHandler(messages.P2PMessageTypePORequest, poRequestHandler)
+	r.AddHandler(messages.P2PMessageTypePOAccepted, poAcceptedHandler)
 
 	p2pChannel := make(chan *common.Message)
 
@@ -70,7 +79,9 @@ func setupP2PClient(
 func setupBlockchainClient(
 	prvKey ed25519.PrivateKey,
 	contractRepo contractRepository.ContractsRepository,
-	cs *contractService.ContractService) common.Messenger {
+	cs *contractService.ContractService,
+	por poRepository.PurchaseOrdersRepository,
+	pos *poService.PurchaseOrderService) common.Messenger {
 
 	hcsClientID := os.Getenv("HCS_CLIENT_ID")
 	hcsMirrorNodeID := os.Getenv("HCS_MIRROR_NODE_ADDRESS")
@@ -81,10 +92,11 @@ func setupBlockchainClient(
 	r := router.NewBusinessMessageRouter(&parser)
 
 	contractHandler := handler.NewBlockchainContractHandler(contractRepo, cs)
-
+	poHandler := handler.NewBlockchainPOHandler(por, pos)
 	// TODO add handlers
 
 	r.AddHandler(messages.BlockchainMessageTypeContract, contractHandler)
+	r.AddHandler(messages.BlockchainMessageTypePO, poHandler)
 
 	ch := make(chan *common.Message)
 
@@ -142,18 +154,18 @@ func main() {
 
 	rfpRepo := rfpMongo.NewRFPRepository(db)
 	proposalRepo := proposalMongo.NewProposalRepository(db)
-	contractRepo := contractMongo.NewContractRepositiry(db)
-	// TODO create more repos
+	contractRepo := contractMongo.NewContractRepository(db)
+	por := poMongo.NewPurchaseOrderRepository(db)
 
 	ps := proposalService.New()
 	cs := contractService.New(prvKey, proposalRepo, ps, peerPubKey)
-	// TODO create more services
+	pos := poService.New(prvKey, contractRepo, cs, peerPubKey)
 
-	hcsClient := setupBlockchainClient(prvKey, contractRepo, cs)
+	hcsClient := setupBlockchainClient(prvKey, contractRepo, cs, por, pos)
 
 	defer hcsClient.Close()
 
-	p2pClient := setupP2PClient(prvKey, hcsClient, rfpRepo, proposalRepo, contractRepo, cs)
+	p2pClient := setupP2PClient(prvKey, hcsClient, rfpRepo, proposalRepo, contractRepo, cs, por, pos)
 
 	defer p2pClient.Close()
 
@@ -165,10 +177,12 @@ func main() {
 	proposalApiService := apiservices.NewProposalService(proposalRepo, p2pClient)
 
 	contractApiService := apiservices.NewContractService(contractRepo, cs, p2pClient)
+	purchaseOrderApiService := apiservices.NewPurchaseOrderService(por, pos, p2pClient)
 
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteRFP), apiRouter.NewRFPRouter(rfpApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteProposal), apiRouter.NewProposalsRouter(proposalApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteContract), apiRouter.NewContractsRouter(contractApiService))
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RoutePO), apiRouter.NewPurchaseOrdersRouter(purchaseOrderApiService))
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)

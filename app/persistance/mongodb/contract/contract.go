@@ -78,6 +78,6 @@ func (r *ContractRepository) Update(contract *model.Contract) error {
 	return nil
 }
 
-func NewContractRepositiry(db *mongo.Database) *ContractRepository {
+func NewContractRepository(db *mongo.Database) *ContractRepository {
 	return &ContractRepository{db: db}
 }

@@ -1,1 +1,1 @@
-go run tools/craetehcstopic/createhcstopic.go
+go run tools/createhcstopic/createhcstopic.go
