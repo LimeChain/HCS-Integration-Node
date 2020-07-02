@@ -19,7 +19,7 @@ import (
 	rfpRepository "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
 	apiRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain/hcs"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/dlt/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common/queue"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"

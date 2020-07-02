@@ -7,7 +7,7 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/contract/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/contract/service"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/blockchain/hcs"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/dlt/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	log "github.com/sirupsen/logrus"
 )
@@ -74,7 +74,7 @@ func (h *BlockchainContractHandler) Handle(msg *common.Message) error {
 		return err
 	}
 
-	log.Infof("Contract with Id: %s seen in the blockchain and verified\n", contract.ContractId)
+	log.Infof("Contract with Id: %s seen in the dlt and verified\n", contract.ContractId)
 	return nil
 }
 
