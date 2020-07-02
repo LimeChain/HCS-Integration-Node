@@ -36,6 +36,10 @@ func (s *PurchaseOrderService) Hash(po *model.UnsignedPurchaseOrder) (string, er
 	sb.WriteString(po.ReferencedContractId)
 	sb.WriteRune(',')
 	sb.WriteString(contractHash)
+	sb.WriteRune(',')
+	sb.WriteString(contract.BuyerSignature)
+	sb.WriteRune(',')
+	sb.WriteString(contract.SupplierSignature)
 
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(sb.String()))), nil
 
