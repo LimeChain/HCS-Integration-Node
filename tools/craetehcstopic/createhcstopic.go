@@ -52,9 +52,6 @@ func main() {
 	a := os.Getenv("A_PUB_KEY")
 	b := os.Getenv("B_PUB_KEY")
 
-	fmt.Println(a)
-	fmt.Println(b)
-
 	aPubKey, err := hedera.Ed25519PublicKeyFromString(a)
 	if err != nil {
 		panic(err)
