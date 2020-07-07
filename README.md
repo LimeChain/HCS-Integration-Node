@@ -41,7 +41,7 @@ The second module is the P2P Messaging Client module. Its main job is to send, r
 
 The third module is the DLT Client. Its main job is to store proofs inside HCS and listen to the communication topic for new proofs stored inside.
 
-The centerpiece of the system is the Domain Logic Handlers module. It is there where the main domain business logic models and handlers are defined and where the business process logic is encoded. Its job is to react to the triggers by invoking the correct business process.
+The centerpiece of the system is the Domain Logic Handlers module. It is there where the main domain business logic models and handlers are defined and where the business process logic is implemented. Its job is to react to the triggers by invoking the correct business process.
 
 The last module is the persistence module. It is used for storing business process artifacts inside the HCSIN and by the Domain Logic Handlers in order to verify and execute the business process.
 
@@ -49,7 +49,7 @@ The last module is the persistence module. It is used for storing business proce
 
 ![docs/images/HCS-Integration-Node-C3.png](docs/images/HCS-Integration-Node-C3.png)
 
-The five main models have their own inner components allowing them to work independently and also allowing for extensibility and modifiability.
+The five main modules have their own inner components allowing them to work independently and also allowing for extensibility and modifiability.
 
 ### REST API
 
@@ -57,7 +57,7 @@ The REST API module has two main components. The first one is the **API Routes**
 
 ### P2P Messaging Client
 
-The P2P Messaging Client module has one main component - the client itself. The client allows for a new connection to be established, sending a message, and receiving one. The P2P client sends the receives messages to a Message Receiver component. In this implementation, we are leveraging the Golang channels in order to streamline the message processing into a queue. Based on the message type received the correct business process handler picks up the message and executes the business process. The current implementation uses the libp2p library.
+The P2P Messaging Client module has one main component - the client itself. The client allows for a new connection to be established, sending a message, and receiving one. The P2P client sends the received messages to a Message Receiver component. In this implementation, we are leveraging the Golang channels in order to streamline the message processing into a queue. Based on the message type received the correct business process handler picks up the message and executes the business process. The current implementation uses the libp2p library.
 
 ### HCS Client
 
