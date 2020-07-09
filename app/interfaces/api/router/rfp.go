@@ -35,6 +35,11 @@ type storedRFPsResponse struct {
 	RFPs []*model.RFP `json:"rfps"`
 }
 
+type storedRFPResponse struct {
+	api.IntegrationNodeAPIResponse
+	RFP *model.RFP `json:"rfp"`
+}
+
 type createRFPResponse struct {
 	api.IntegrationNodeAPIResponse
 	RFPId string `json:"rfpId,omitempty"`
@@ -75,6 +80,18 @@ func getAllStoredRFPs(rfpService *apiservices.RFPService) func(w http.ResponseWr
 	}
 }
 
+func getRFPById(rfpService *apiservices.RFPService) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rfpId := chi.URLParam(r, "rfpId")
+		rfp, err := rfpService.GetRFP(rfpId)
+		if err != nil {
+			render.JSON(w, r, storedRFPResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
+			return
+		}
+		render.JSON(w, r, storedRFPResponse{api.IntegrationNodeAPIResponse{Status: true, Error: ""}, rfp})
+	}
+}
+
 func createRFP(rfpService *apiservices.RFPService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var rfpRequest *CreateRFPRequest
@@ -110,6 +127,7 @@ func createRFP(rfpService *apiservices.RFPService) func(w http.ResponseWriter, r
 func NewRFPRouter(rfpService *apiservices.RFPService) http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", getAllStoredRFPs(rfpService))
+	r.Get("/{rfpId}", getRFPById(rfpService))
 	r.Post("/", createRFP(rfpService))
 	return r
 }

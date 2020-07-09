@@ -24,6 +24,11 @@ type storedContractsResponse struct {
 	Contracts []*contractModel.Contract `json:"contracts"`
 }
 
+type storedContractResponse struct {
+	api.IntegrationNodeAPIResponse
+	Contract *contractModel.Contract `json:"contract"`
+}
+
 type sendContractResponse struct {
 	api.IntegrationNodeAPIResponse
 	ContractId        string `json:"contractId, omitempty" bson:"contractId"`
@@ -48,6 +53,18 @@ func getAllStoredContracts(contractsService *apiservices.ContractService) func(w
 			return
 		}
 		render.JSON(w, r, storedContractsResponse{api.IntegrationNodeAPIResponse{Status: true, Error: ""}, storedContracts})
+	}
+}
+
+func getContractById(contractsService *apiservices.ContractService) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		contractId := chi.URLParam(r, "contractId")
+		storedContract, err := contractsService.GetContract(contractId)
+		if err != nil {
+			render.JSON(w, r, storedContractResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
+			return
+		}
+		render.JSON(w, r, storedContractResponse{api.IntegrationNodeAPIResponse{Status: true, Error: ""}, storedContract})
 	}
 }
 
@@ -91,6 +108,7 @@ func sendContract(contractsService *apiservices.ContractService) func(w http.Res
 func NewContractsRouter(contractsService *apiservices.ContractService) http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", getAllStoredContracts(contractsService))
+	r.Get("/{contractId}", getContractById(contractsService))
 	r.Post("/", sendContract(contractsService))
 	return r
 }

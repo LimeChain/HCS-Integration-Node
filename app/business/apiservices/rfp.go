@@ -18,6 +18,10 @@ func (s *RFPService) GetAllRFPs() ([]*rfpModel.RFP, error) {
 	return s.repo.GetAll()
 }
 
+func (s *RFPService) GetRFP(rfpId string) (*rfpModel.RFP, error) {
+	return s.repo.GetByID(rfpId)
+}
+
 func (s *RFPService) CreateRFP(rfp *rfpModel.RFP) (id string, err error) {
 	rfpId, err := s.repo.Save(rfp)
 	if err != nil {
