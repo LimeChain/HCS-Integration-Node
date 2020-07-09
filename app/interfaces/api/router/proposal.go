@@ -40,6 +40,11 @@ type storedProposalsResponse struct {
 	Proposals []*proposalModel.Proposal `json:"proposals"`
 }
 
+type storedProposalResponse struct {
+	api.IntegrationNodeAPIResponse
+	Proposal *proposalModel.Proposal `json:"proposal"`
+}
+
 type createProposalsResponse struct {
 	api.IntegrationNodeAPIResponse
 	ProposalId string `json:"proposalId,omitempty"`
@@ -84,6 +89,18 @@ func getAllStoredProposals(proposalService *apiservices.ProposalService) func(w 
 	}
 }
 
+func getProposalByID(proposalService *apiservices.ProposalService) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		proposalID := chi.URLParam(r, "proposalID")
+		storedProposal, err := proposalService.GetProposal(proposalID)
+		if err != nil {
+			render.JSON(w, r, storedProposalResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
+			return
+		}
+		render.JSON(w, r, storedProposalResponse{api.IntegrationNodeAPIResponse{Status: true, Error: ""}, storedProposal})
+	}
+}
+
 func createProposal(proposalService *apiservices.ProposalService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var proposalRequest *CreateProposal
@@ -119,6 +136,7 @@ func createProposal(proposalService *apiservices.ProposalService) func(w http.Re
 func NewProposalsRouter(proposalService *apiservices.ProposalService) http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", getAllStoredProposals(proposalService))
+	r.Get("/{proposalID}", getProposalByID(proposalService))
 	r.Post("/", createProposal(proposalService))
 	return r
 }

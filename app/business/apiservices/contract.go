@@ -20,6 +20,10 @@ func (s *ContractService) GetAllContracts() ([]*contractModel.Contract, error) {
 	return s.cr.GetAll()
 }
 
+func (s *ContractService) GetContract(contractID string) (*contractModel.Contract, error) {
+	return s.cr.GetByID(contractID)
+}
+
 func (s *ContractService) SaveAndSendContract(unsignedContract *contractModel.UnsignedContract) (contractId, contractHash, contractSignature string, err error) {
 	contractHash, err = s.cs.Hash(unsignedContract)
 	if err != nil {

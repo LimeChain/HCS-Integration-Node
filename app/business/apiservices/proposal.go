@@ -18,6 +18,10 @@ func (s *ProposalService) GetAllProposals() ([]*proposalModel.Proposal, error) {
 	return s.repo.GetAll()
 }
 
+func (s *ProposalService) GetProposal(proposalID string) (*proposalModel.Proposal, error) {
+	return s.repo.GetByID(proposalID)
+}
+
 func (s *ProposalService) CreateProposal(proposal *proposalModel.Proposal) (id string, err error) {
 	proposalId, err := s.repo.Save(proposal)
 	if err != nil {

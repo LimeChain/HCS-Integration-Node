@@ -20,6 +20,10 @@ func (s *PurchaseOrderService) GetAllPurchaseOrders() ([]*poModel.PurchaseOrder,
 	return s.por.GetAll()
 }
 
+func (s *PurchaseOrderService) GetPurchaseOrder(purchaseOrderID string) (*poModel.PurchaseOrder, error) {
+	return s.por.GetByID(purchaseOrderID)
+}
+
 func (s *PurchaseOrderService) SaveAndSendPurchaseOrder(unsignedPurchaseOrder *poModel.UnsignedPurchaseOrder) (purchaseOrderId, purchaseOrderHash, purchaseOrderSignature string, err error) {
 	purchaseOrderHash, err = s.pos.Hash(unsignedPurchaseOrder)
 	if err != nil {
