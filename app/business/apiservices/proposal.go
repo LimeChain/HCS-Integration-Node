@@ -18,8 +18,8 @@ func (s *ProposalService) GetAllProposals() ([]*proposalModel.Proposal, error) {
 	return s.repo.GetAll()
 }
 
-func (s *ProposalService) GetProposal(proposalID string) (*proposalModel.Proposal, error) {
-	return s.repo.GetByID(proposalID)
+func (s *ProposalService) GetProposal(proposalId string) (*proposalModel.Proposal, error) {
+	return s.repo.GetByID(proposalId)
 }
 
 func (s *ProposalService) CreateProposal(proposal *proposalModel.Proposal) (id string, err error) {

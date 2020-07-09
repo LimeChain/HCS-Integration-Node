@@ -56,10 +56,10 @@ func getAllStoredContracts(contractsService *apiservices.ContractService) func(w
 	}
 }
 
-func getContractByID(contractsService *apiservices.ContractService) func(w http.ResponseWriter, r *http.Request) {
+func getContractById(contractsService *apiservices.ContractService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		contractID := chi.URLParam(r, "contractID")
-		storedContract, err := contractsService.GetContract(contractID)
+		contractId := chi.URLParam(r, "contractId")
+		storedContract, err := contractsService.GetContract(contractId)
 		if err != nil {
 			render.JSON(w, r, storedContractResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
 			return
@@ -108,7 +108,7 @@ func sendContract(contractsService *apiservices.ContractService) func(w http.Res
 func NewContractsRouter(contractsService *apiservices.ContractService) http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", getAllStoredContracts(contractsService))
-	r.Get("/{contractID}", getContractByID(contractsService))
+	r.Get("/{contractId}", getContractById(contractsService))
 	r.Post("/", sendContract(contractsService))
 	return r
 }

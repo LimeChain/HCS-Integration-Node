@@ -80,10 +80,10 @@ func getAllStoredRFPs(rfpService *apiservices.RFPService) func(w http.ResponseWr
 	}
 }
 
-func getRFPByID(rfpService *apiservices.RFPService) func(w http.ResponseWriter, r *http.Request) {
+func getRFPById(rfpService *apiservices.RFPService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rfpID := chi.URLParam(r, "rfpID")
-		rfp, err := rfpService.GetRFP(rfpID)
+		rfpId := chi.URLParam(r, "rfpId")
+		rfp, err := rfpService.GetRFP(rfpId)
 		if err != nil {
 			render.JSON(w, r, storedRFPResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
 			return
@@ -127,7 +127,7 @@ func createRFP(rfpService *apiservices.RFPService) func(w http.ResponseWriter, r
 func NewRFPRouter(rfpService *apiservices.RFPService) http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", getAllStoredRFPs(rfpService))
-	r.Get("/{rfpID}", getRFPByID(rfpService))
+	r.Get("/{rfpId}", getRFPById(rfpService))
 	r.Post("/", createRFP(rfpService))
 	return r
 }

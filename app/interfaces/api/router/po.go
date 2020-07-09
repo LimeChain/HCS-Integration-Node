@@ -84,10 +84,10 @@ func getAllStoredPOs(poService *apiservices.PurchaseOrderService) func(w http.Re
 	}
 }
 
-func getPurchaseOrderByID(poService *apiservices.PurchaseOrderService) func(w http.ResponseWriter, r *http.Request) {
+func getPurchaseOrderById(poService *apiservices.PurchaseOrderService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		purchaseOrderID := chi.URLParam(r, "purchaseOrderID")
-		storedPO, err := poService.GetPurchaseOrder(purchaseOrderID)
+		purchaseOrderId := chi.URLParam(r, "purchaseOrderId")
+		storedPO, err := poService.GetPurchaseOrder(purchaseOrderId)
 		if err != nil {
 			render.JSON(w, r, storedPOResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}, nil})
 			return
@@ -136,7 +136,7 @@ func sendPO(poService *apiservices.PurchaseOrderService) func(w http.ResponseWri
 func NewPurchaseOrdersRouter(purchaseOrdersService *apiservices.PurchaseOrderService) http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", getAllStoredPOs(purchaseOrdersService))
-	r.Get("/{purchaseOrderID}", getPurchaseOrderByID(purchaseOrdersService))
+	r.Get("/{purchaseOrderId}", getPurchaseOrderById(purchaseOrdersService))
 	r.Post("/", sendPO(purchaseOrdersService))
 	return r
 }
