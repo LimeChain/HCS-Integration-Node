@@ -59,13 +59,13 @@ func (c *LibP2PClient) Close() error {
 	return nil
 }
 
-func NewLibP2PClient(key ed25519.PrivateKey, listenPort, peerMultiAddr string) *LibP2PClient {
+func NewLibP2PClient(key ed25519.PrivateKey, listenIp, listenPort, peerMultiAddr string) *LibP2PClient {
 	libp2pKey, err := crypto.UnmarshalEd25519PrivateKey(key)
 	if err != nil {
 		panic(err)
 	}
 
-	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/0.0.0.0/tcp/%s", listenPort))
+	sourceMultiAddr, _ := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/%s/tcp/%s", listenIp, listenPort))
 
 	h, err := libp2p.New(context.Background(), libp2p.ListenAddrs(sourceMultiAddr), libp2p.Identity(libp2pKey))
 	if err != nil {
@@ -81,7 +81,7 @@ func NewLibP2PClient(key ed25519.PrivateKey, listenPort, peerMultiAddr string) *
 		panic(err)
 	}
 
-	log.Infof("[LIBP2P] Started libp2p host and listening on: %s\n", addrs[0])
+	log.Infof("[LIBP2P] Started libp2p host and listening on: %s \n", addrs[0])
 
 	client := &LibP2PClient{h: h}
 

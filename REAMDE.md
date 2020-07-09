@@ -27,3 +27,72 @@ Run `./start.sh`
 2. Run mongo with different name port and data storage path
 3. Create `peer2.env` based on `.env.example`
 4. Run `./start-peer2.sh`
+
+### Deployment process - Using Terraform to create HCS nodes in Google Cloud
+
+We will be deploying two Compute Engine VM instances with a started and connected HCS node on each of them.  
+
+**Before we begin, have the following tools locally:**
+
+- gcloud;
+- [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html);
+- [jq](https://stedolan.github.io/jq/download/);
+
+**Create a Google Cloud project**
+
+We will start by creating a new project to keep this separate and easy to tear down later. After creating it, copy down the project ID and replace the default project ID with yours in the following places:
+
+`./Makefile`:
+
+```jsx
+GCP_PROJECT ?= hcs-integration-node
+```
+
+`.terraform/variables.tf`:
+
+```jsx
+variable "project_id" {
+  default = "hcs-integration-node"
+}
+```
+
+**Prepare Google Cloud SDK authentication:**
+
+```jsx
+$ gcloud auth login
+$ gcloud auth application-default login
+```
+
+**Switch to newly created project:**
+
+```jsx
+$ gcloud config set project PROJECT_ID
+```
+
+**Environment variable files:**
+
+Before starting the deployment procedure, make sure you have:
+
+- a Hedera Operator Account variables or a PEM encoded private key placed in `./config/`;
+- created HCS topic;
+- mongo connection string and db name;
+- make sure the API_PORT variables of the both nodes match those specified in `.terraform/variables.tf`;
+- activated a log with the following name: `LOG_FILE=hcsnode.log` ;
+
+`P2P_IP` and `PEER_ADDRESS` will be configured during the deployment process.
+
+**Provision the infrastructure:**
+
+The command that will ensure the deployment of the infrastructure is:
+
+```jsx
+make provision
+```
+
+After successful completion, we will be able to interact with each HCS node through their external IPs.
+
+**Deprovision the infrastructure:**
+
+```jsx
+make deprovision
+```

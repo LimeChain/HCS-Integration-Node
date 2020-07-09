@@ -43,9 +43,10 @@ func setupP2PClient(
 	pos *poService.PurchaseOrderService) common.Messenger {
 
 	listenPort := os.Getenv("P2P_PORT")
+	listenIp := os.Getenv("P2P_IP")
 	peerMultiAddr := os.Getenv("PEER_ADDRESS")
 
-	p2pClient := libp2p.NewLibP2PClient(prvKey, listenPort, peerMultiAddr)
+	p2pClient := libp2p.NewLibP2PClient(prvKey, listenIp, listenPort, peerMultiAddr)
 
 	// TODO get some env variables
 	// TODO add more handlers
