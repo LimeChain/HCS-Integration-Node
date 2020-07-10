@@ -185,6 +185,7 @@ func main() {
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteProposal), apiRouter.NewProposalsRouter(proposalApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteContract), apiRouter.NewContractsRouter(contractApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RoutePO), apiRouter.NewPurchaseOrdersRouter(purchaseOrderApiService))
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.Swagger), apiRouter.NewSwaggerRouter())
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)

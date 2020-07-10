@@ -5,4 +5,5 @@ const (
 	RouteProposal = "proposal"
 	RouteContract = "contract"
 	RoutePO       = "po"
+	Swagger		  = "swagger"
 )
