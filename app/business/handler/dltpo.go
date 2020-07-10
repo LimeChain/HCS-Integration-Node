@@ -7,19 +7,19 @@ import (
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/service"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/dlt/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/dlt/hcs"
 	log "github.com/sirupsen/logrus"
 )
 
-type BlockchainPOHandler struct {
+type DLTPOHandler struct {
 	por repository.PurchaseOrdersRepository
 	pos *service.PurchaseOrderService
 }
 
-func (h *BlockchainPOHandler) Handle(msg *common.Message) error {
+func (h *DLTPOHandler) Handle(msg *common.Message) error {
 
-	var purchaseOrderMsg messages.BlockchainPOMessage
+	var purchaseOrderMsg messages.DLTPOMessage
 	err := json.Unmarshal(msg.Msg, &purchaseOrderMsg)
 	if err != nil {
 		return err
@@ -43,11 +43,11 @@ func (h *BlockchainPOHandler) Handle(msg *common.Message) error {
 	}
 
 	if savedPO.BuyerSignature != po.BuyerSignature {
-		return errors.New("The po buyer signature was not the one storred")
+		return errors.New("The po buyer signature was not the one stored")
 	}
 
 	if savedPO.SupplierSignature != po.SupplierSignature {
-		return errors.New("The po supplier signature was not the one storred")
+		return errors.New("The po supplier signature was not the one stored")
 	}
 
 	savedHash, err := h.pos.Hash(&savedPO.UnsignedPurchaseOrder)
@@ -63,11 +63,11 @@ func (h *BlockchainPOHandler) Handle(msg *common.Message) error {
 	}
 
 	if savedHash != po.PurchaseOrderHash {
-		return errors.New("The po hash was not the one storred")
+		return errors.New("The po hash was not the one stored")
 	}
 
-	savedPO.BlockchainAnchored = true
-	savedPO.BlockchainProof = fmt.Sprintf("%d", sequenceNumber)
+	savedPO.DLTAnchored = true
+	savedPO.DLTProof = fmt.Sprintf("%d", sequenceNumber)
 
 	err = h.por.Update(savedPO)
 	if err != nil {
@@ -78,6 +78,6 @@ func (h *BlockchainPOHandler) Handle(msg *common.Message) error {
 	return nil
 }
 
-func NewBlockchainPOHandler(por repository.PurchaseOrdersRepository, pos *service.PurchaseOrderService) *BlockchainPOHandler {
-	return &BlockchainPOHandler{por: por, pos: pos}
+func NewDLTPOHandler(por repository.PurchaseOrdersRepository, pos *service.PurchaseOrderService) *DLTPOHandler {
+	return &DLTPOHandler{por: por, pos: pos}
 }

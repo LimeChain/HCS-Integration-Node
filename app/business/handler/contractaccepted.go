@@ -12,9 +12,9 @@ import (
 )
 
 type ContractAcceptedHandler struct {
-	contractsRepo    repository.ContractsRepository
-	blockchainClient common.Messenger
-	contractService  *service.ContractService
+	contractsRepo   repository.ContractsRepository
+	dltClient       common.Messenger
+	contractService *service.ContractService
 }
 
 func (h *ContractAcceptedHandler) Handle(msg *common.Message) error {
@@ -43,7 +43,7 @@ func (h *ContractAcceptedHandler) Handle(msg *common.Message) error {
 	}
 
 	if savedContract.BuyerSignature != contract.BuyerSignature {
-		return errors.New("The contract buyer signature was not the one storred. The supplier has tried to cheat you")
+		return errors.New("The contract buyer signature was not the one stored. The supplier has tried to cheat you")
 	}
 
 	contractHash, err := h.contractService.Hash(&contract.UnsignedContract)
@@ -60,15 +60,15 @@ func (h *ContractAcceptedHandler) Handle(msg *common.Message) error {
 		return errors.New("Invalid signature by the supplier")
 	}
 
-	blockchainMessage := messages.CreateBlockchainContractMessage(contract.ContractId, contractHash, contract.BuyerSignature, contract.SupplierSignature)
+	dltMessage := messages.CreateDLTContractMessage(contract.ContractId, contractHash, contract.BuyerSignature, contract.SupplierSignature)
 
-	blockchainBytes, err := json.Marshal(blockchainMessage)
+	dltBytes, err := json.Marshal(dltMessage)
 	if err != nil {
 		// TODO delete from db if cannot marshal
 		return err
 	}
 
-	err = h.blockchainClient.Send(&common.Message{Ctx: context.TODO(), Msg: blockchainBytes})
+	err = h.dltClient.Send(&common.Message{Ctx: context.TODO(), Msg: dltBytes})
 	if err != nil {
 		return err
 	}
@@ -82,6 +82,6 @@ func (h *ContractAcceptedHandler) Handle(msg *common.Message) error {
 	return nil
 }
 
-func NewContractAcceptedHandler(contractsRepo repository.ContractsRepository, contractService *service.ContractService, blockchainClient common.Messenger) *ContractAcceptedHandler {
-	return &ContractAcceptedHandler{contractsRepo: contractsRepo, contractService: contractService, blockchainClient: blockchainClient}
+func NewContractAcceptedHandler(contractsRepo repository.ContractsRepository, contractService *service.ContractService, dltClient common.Messenger) *ContractAcceptedHandler {
+	return &ContractAcceptedHandler{contractsRepo: contractsRepo, contractService: contractService, dltClient: dltClient}
 }

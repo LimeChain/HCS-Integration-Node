@@ -19,9 +19,9 @@ import (
 	rfpRepository "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/api"
 	apiRouter "github.com/Limechain/HCS-Integration-Node/app/interfaces/api/router"
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/dlt/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common/queue"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/dlt/hcs"
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
 	contractMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/contract"
 	proposalMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/proposal"
@@ -77,7 +77,7 @@ func setupP2PClient(
 	return p2pClient
 }
 
-func setupBlockchainClient(
+func setupDLTClient(
 	prvKey ed25519.PrivateKey,
 	contractRepo contractRepository.ContractsRepository,
 	cs *contractService.ContractService,
@@ -92,12 +92,12 @@ func setupBlockchainClient(
 
 	r := router.NewBusinessMessageRouter(&parser)
 
-	contractHandler := handler.NewBlockchainContractHandler(contractRepo, cs)
-	poHandler := handler.NewBlockchainPOHandler(por, pos)
+	contractHandler := handler.NewDLTContractHandler(contractRepo, cs)
+	poHandler := handler.NewDLTPOHandler(por, pos)
 	// TODO add handlers
 
-	r.AddHandler(messages.BlockchainMessageTypeContract, contractHandler)
-	r.AddHandler(messages.BlockchainMessageTypePO, poHandler)
+	r.AddHandler(messages.DLTMessageTypeContract, contractHandler)
+	r.AddHandler(messages.DLTMessageTypePO, poHandler)
 
 	ch := make(chan *common.Message)
 
@@ -162,7 +162,7 @@ func main() {
 	cs := contractService.New(prvKey, proposalRepo, ps, peerPubKey)
 	pos := poService.New(prvKey, contractRepo, cs, peerPubKey)
 
-	hcsClient := setupBlockchainClient(prvKey, contractRepo, cs, por, pos)
+	hcsClient := setupDLTClient(prvKey, contractRepo, cs, por, pos)
 
 	defer hcsClient.Close()
 

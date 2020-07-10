@@ -24,6 +24,6 @@ type PurchaseOrder struct {
 	UnsignedPurchaseOrder `json:"unsignedPurchaseOrder" bson:"unsignedPurchaseOrder"`
 	BuyerSignature        string `json:"buyerSignature" bson:"buyerSignature"`
 	SupplierSignature     string `json:"supplierSignature" bson:"supplierSignature"`
-	BlockchainAnchored    bool   `json:"blockchainAnchored" bson:"blockchainAnchored"`
-	BlockchainProof       string `json:"blockchainProof" bson:"blockchainProof"`
+	DLTAnchored           bool   `json:"DLTAnchored" bson:"DLTAnchored"`
+	DLTProof              string `json:"DLTProof" bson:"DLTProof"`
 }
