@@ -1,21 +1,21 @@
 package messages
 
-type blockchainPO struct {
+type dltPO struct {
 	PurchaseOrderId   string `json:"purchaseOrderId"`
 	PurchaseOrderHash string `json:"purchaseOrderHash"`
 	BuyerSignature    string `json:"buyerSignature"`
 	SupplierSignature string `json:"supplierSignature"`
 }
 
-type BlockchainPOMessage struct {
+type DLTPOMessage struct {
 	BusinessMessage
-	Data blockchainPO `json:"data"`
+	Data dltPO `json:"data"`
 }
 
-func CreateBlockchainPOMessage(purchaseOrderId, purchaseOrderHash, buyerSignature, supplierSignature string) *BlockchainPOMessage {
-	return &BlockchainPOMessage{
-		BusinessMessage: BusinessMessage{Type: BlockchainMessageTypePO},
-		Data: blockchainPO{
+func CreateDLTPOMessage(purchaseOrderId, purchaseOrderHash, buyerSignature, supplierSignature string) *DLTPOMessage {
+	return &DLTPOMessage{
+		BusinessMessage: BusinessMessage{Type: DLTMessageTypePO},
+		Data: dltPO{
 			PurchaseOrderId:   purchaseOrderId,
 			PurchaseOrderHash: purchaseOrderHash,
 			BuyerSignature:    buyerSignature,

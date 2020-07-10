@@ -14,6 +14,6 @@ const (
 )
 
 const (
-	BlockchainMessageTypeContract = "contract"
-	BlockchainMessageTypePO       = "po"
+	DLTMessageTypeContract = "contract"
+	DLTMessageTypePO       = "po"
 )

@@ -12,9 +12,9 @@ import (
 )
 
 type PurchaseOrderAcceptedHandler struct {
-	por              repository.PurchaseOrdersRepository
-	blockchainClient common.Messenger
-	pos              *service.PurchaseOrderService
+	por       repository.PurchaseOrdersRepository
+	dltClient common.Messenger
+	pos       *service.PurchaseOrderService
 }
 
 func (h *PurchaseOrderAcceptedHandler) Handle(msg *common.Message) error {
@@ -43,7 +43,7 @@ func (h *PurchaseOrderAcceptedHandler) Handle(msg *common.Message) error {
 	}
 
 	if savedPO.BuyerSignature != po.BuyerSignature {
-		return errors.New("The po buyer signature was not the one storred. The supplier has tried to cheat you")
+		return errors.New("The po buyer signature was not the one stored. The supplier has tried to cheat you")
 	}
 
 	purchaseOrderHash, err := h.pos.Hash(&po.UnsignedPurchaseOrder)
@@ -60,15 +60,15 @@ func (h *PurchaseOrderAcceptedHandler) Handle(msg *common.Message) error {
 		return errors.New("Invalid signature by the supplier")
 	}
 
-	blockchainMessage := messages.CreateBlockchainPOMessage(po.PurchaseOrderId, purchaseOrderHash, po.BuyerSignature, po.SupplierSignature)
+	dltMessage := messages.CreateDLTPOMessage(po.PurchaseOrderId, purchaseOrderHash, po.BuyerSignature, po.SupplierSignature)
 
-	blockchainBytes, err := json.Marshal(blockchainMessage)
+	dltBytes, err := json.Marshal(dltMessage)
 	if err != nil {
 		// TODO delete from db if cannot marshal
 		return err
 	}
 
-	err = h.blockchainClient.Send(&common.Message{Ctx: context.TODO(), Msg: blockchainBytes})
+	err = h.dltClient.Send(&common.Message{Ctx: context.TODO(), Msg: dltBytes})
 	if err != nil {
 		return err
 	}
@@ -82,6 +82,6 @@ func (h *PurchaseOrderAcceptedHandler) Handle(msg *common.Message) error {
 	return nil
 }
 
-func NewPOAcceptedHandler(por repository.PurchaseOrdersRepository, pos *service.PurchaseOrderService, blockchainClient common.Messenger) *PurchaseOrderAcceptedHandler {
-	return &PurchaseOrderAcceptedHandler{por: por, pos: pos, blockchainClient: blockchainClient}
+func NewPOAcceptedHandler(por repository.PurchaseOrdersRepository, pos *service.PurchaseOrderService, dltClient common.Messenger) *PurchaseOrderAcceptedHandler {
+	return &PurchaseOrderAcceptedHandler{por: por, pos: pos, dltClient: dltClient}
 }

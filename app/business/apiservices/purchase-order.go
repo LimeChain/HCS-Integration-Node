@@ -33,7 +33,7 @@ func (s *PurchaseOrderService) SaveAndSendPurchaseOrder(unsignedPurchaseOrder *p
 	if err != nil {
 		return "", "", "", err
 	}
-	signedPurchaseOrder := &poModel.PurchaseOrder{UnsignedPurchaseOrder: *unsignedPurchaseOrder, BuyerSignature: purchaseOrderSignature, BlockchainAnchored: false}
+	signedPurchaseOrder := &poModel.PurchaseOrder{UnsignedPurchaseOrder: *unsignedPurchaseOrder, BuyerSignature: purchaseOrderSignature, DLTAnchored: false}
 	purchaseOrderId, err = s.por.Save(signedPurchaseOrder)
 	if err != nil {
 		return "", "", "", err

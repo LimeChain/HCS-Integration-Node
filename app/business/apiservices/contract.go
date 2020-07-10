@@ -33,7 +33,7 @@ func (s *ContractService) SaveAndSendContract(unsignedContract *contractModel.Un
 	if err != nil {
 		return "", "", "", err
 	}
-	signedContract := &contractModel.Contract{UnsignedContract: *unsignedContract, BuyerSignature: contractSignature, BlockchainAnchored: false}
+	signedContract := &contractModel.Contract{UnsignedContract: *unsignedContract, BuyerSignature: contractSignature, DLTAnchored: false}
 	contractId, err = s.cr.Save(signedContract)
 	if err != nil {
 		return "", "", "", err
