@@ -84,6 +84,7 @@ func setupDLTClient(
 	por poRepository.PurchaseOrdersRepository,
 	pos *poService.PurchaseOrderService) common.Messenger {
 
+	shouldConnectToMainnet := (os.Getenv("HCS_MAINNET") == "true")
 	hcsClientID := os.Getenv("HCS_CLIENT_ID")
 	hcsMirrorNodeID := os.Getenv("HCS_MIRROR_NODE_ADDRESS")
 	topicID := os.Getenv("HCS_TOPIC_ID")
@@ -103,7 +104,7 @@ func setupDLTClient(
 
 	q := queue.New(ch, r)
 
-	hcsClient := hcs.NewHCSClient(hcsClientID, prvKey, hcsMirrorNodeID, topicID)
+	hcsClient := hcs.NewHCSClient(hcsClientID, prvKey, hcsMirrorNodeID, topicID, shouldConnectToMainnet)
 
 	err := hcsClient.Listen(q)
 	if err != nil {

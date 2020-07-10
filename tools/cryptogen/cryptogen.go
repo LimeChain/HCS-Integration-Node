@@ -24,7 +24,10 @@ func generateEd25519Keypair() ed25519.PrivateKey {
 	return priv
 }
 
-func createTestnetHederaAccount(key ed25519.PrivateKey) hedera.AccountID {
+func createHederaAccount(key ed25519.PrivateKey) hedera.AccountID {
+
+	shouldConnectToMainnet := (os.Getenv("HCS_MAINNET") == "true")
+
 	operatorAccountID, err := hedera.AccountIDFromString(os.Getenv("HCS_OPERATOR_ID"))
 	if err != nil {
 		panic(err)
@@ -42,8 +45,15 @@ func createTestnetHederaAccount(key ed25519.PrivateKey) hedera.AccountID {
 
 	fmt.Printf("Hedera Account Public Key: %v\n", newKey.PublicKey().String())
 
-	client := hedera.ClientForTestnet().
-		SetOperator(operatorAccountID, operatorPrivateKey)
+	var client *hedera.Client
+
+	if shouldConnectToMainnet {
+		client = hedera.ClientForMainnet()
+	} else {
+		client = hedera.ClientForTestnet()
+	}
+
+	client = client.SetOperator(operatorAccountID, operatorPrivateKey)
 
 	transactionID, err := hedera.NewAccountCreateTransaction().
 		SetKey(newKey.PublicKey()).
@@ -83,7 +93,7 @@ func main() {
 
 	key := generateEd25519Keypair()
 
-	hcsAccId := createTestnetHederaAccount(key)
+	hcsAccId := createHederaAccount(key)
 
 	fmt.Printf("Hedera Account Id %v\n", hcsAccId.String())
 

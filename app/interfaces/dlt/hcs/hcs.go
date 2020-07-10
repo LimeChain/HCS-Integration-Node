@@ -67,7 +67,7 @@ func (c *HCSClient) Close() error {
 	return nil
 }
 
-func NewHCSClient(account string, key ed25519.PrivateKey, mirrorNodeAddress, topicID string) *HCSClient {
+func NewHCSClient(account string, key ed25519.PrivateKey, mirrorNodeAddress, topicID string, mainnet bool) *HCSClient {
 
 	hcsPrvKey, err := hedera.Ed25519PrivateKeyFromBytes(key)
 	if err != nil {
@@ -84,8 +84,17 @@ func NewHCSClient(account string, key ed25519.PrivateKey, mirrorNodeAddress, top
 		panic(err)
 	}
 
-	client := hedera.ClientForTestnet().
-		SetOperator(acc, hcsPrvKey)
+	var client *hedera.Client
+
+	if mainnet {
+		client = hedera.ClientForMainnet()
+		log.Infoln("[HCS] HCS Client connecting to mainnet")
+	} else {
+		client = hedera.ClientForTestnet()
+		log.Infoln("[HCS] HCS Client connecting to testnet")
+	}
+
+	client = client.SetOperator(acc, hcsPrvKey)
 
 	hcsTopicId, err := hedera.TopicIDFromString(topicID)
 	if err != nil {

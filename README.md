@@ -138,7 +138,8 @@ The domain module defines the interface of the different repositories that need 
 # Running the node
 ## Create the crypto keys
 - Using a Hedera Operator Account:
-    - set follow environment variables - `HCS_OPERATOR_ID` and `HCS_OPERATOR_PRV_KEY`;
+    - Set follow environment variables - `HCS_OPERATOR_ID` and `HCS_OPERATOR_PRV_KEY`;
+    - Optionally set `HCS_MAINNET` environment variable to `true` in order to create the keypair on mainnet. If it is missing or is not true it will default to testnet.
     Example: `HCS_OPERATOR_ID=0.0.7506 HCS_OPERATOR_PRV_KEY=... ./cryptogen.sh`
 - Using own PEM encoded private key:
     - place a PEM encoded file in `config/key.pem`;
@@ -146,6 +147,9 @@ The domain module defines the interface of the different repositories that need 
 If you want to have another keypair, just rename the file and run cryptogen again.
 
 ## Creating HCS Topic with threshold keys using Hedera Operator Account
+- Set follow environment variables - `HCS_OPERATOR_ID` and `HCS_OPERATOR_PRV_KEY` - they will be used for topic creation;
+- Set follow environment variables - `A_PUB_KEY` and `B_PUB_KEY` - they will be given the rights to submit messages in the topic;
+- Optionally set `HCS_MAINNET` environment variable to `true` in order to create the keypair on mainnet. If it is missing or is not true it will default to testnet.
 Example `HCS_OPERATOR_ID=0.0.7506 HCS_OPERATOR_PRV_KEY=... A_PUB_KEY=302a300506032b6570032100086e579c72b037e72bddc3d5c8af5e7b5e5269ab6bb025792a480940ba501b16 B_PUB_KEY=302a300506032b65700321005685758381e67fdaf28b6a992e1e725a707e95280d89eae47fc5132271dc2b1a ./createhcstopic.sh`
 
 ## Run your mongo database

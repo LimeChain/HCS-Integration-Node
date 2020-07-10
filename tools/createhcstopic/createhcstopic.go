@@ -7,7 +7,9 @@ import (
 	"os"
 )
 
-func createTestnetTopic(a, b hedera.PublicKey) hedera.ConsensusTopicID {
+func createHCSTopic(a, b hedera.PublicKey) hedera.ConsensusTopicID {
+	shouldConnectToMainnet := (os.Getenv("HCS_MAINNET") == "true")
+
 	operatorAccountID, err := hedera.AccountIDFromString(os.Getenv("HCS_OPERATOR_ID"))
 	if err != nil {
 		panic(err)
@@ -18,10 +20,17 @@ func createTestnetTopic(a, b hedera.PublicKey) hedera.ConsensusTopicID {
 		panic(err)
 	}
 
-	pubKeys := []hedera.PublicKey{a,b}
+	pubKeys := []hedera.PublicKey{a, b}
 
-	client := hedera.ClientForTestnet().
-		SetOperator(operatorAccountID, operatorPrivateKey)
+	var client *hedera.Client
+
+	if shouldConnectToMainnet {
+		client = hedera.ClientForMainnet()
+	} else {
+		client = hedera.ClientForTestnet()
+	}
+
+	client = client.SetOperator(operatorAccountID, operatorPrivateKey)
 
 	thresholdKey := hedera.NewThresholdKey(1).AddAll(pubKeys)
 
@@ -62,7 +71,7 @@ func main() {
 		panic(err)
 	}
 
-	topicID := createTestnetTopic(aPubKey, bPubKey)
+	topicID := createHCSTopic(aPubKey, bPubKey)
 
 	fmt.Printf("topicID: %v\n", topicID)
 
