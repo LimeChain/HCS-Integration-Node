@@ -55,6 +55,8 @@ The five main modules have their own inner components allowing them to work inde
 
 The REST API module has two main components. The first one is the **API Routes** component specifying and enabling the HCSIN to be reached by the client application. The second one is the **API Controllers** - parsing the requests and adding context params where needed. Every controller invokes an API Request Handler Service in order to trigger the correct business process. The current implementation uses the go-chi REST API library.
 
+Swagger UI - [API_URL/swagger/index.html](API_URL/swagger/index.html)
+
 ### P2P Messaging Client
 
 The P2P Messaging Client module has one main component - the client itself. The client allows for a new connection to be established, sending a message, and receiving one. The P2P client sends the received messages to a Message Receiver component. In this implementation, we are leveraging the Golang channels in order to streamline the message processing into a queue. Based on the message type received the correct business process handler picks up the message and executes the business process. The current implementation uses the libp2p library.

@@ -1,0 +1,666 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "HCS-Peer-swagger",
+        "contact": {}
+    },
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/rfp": {
+            "post": {
+                "summary": "Create RFP",
+                "tags": [
+                    "RequestForProposals"
+                ],
+                "operationId": "CreateRFP",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CreateRFPRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get All RFPs",
+                "tags": [
+                    "RequestForProposals"
+                ],
+                "operationId": "GetAllRFPs",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/rfp/{id}": {
+            "get": {
+                "summary": "Get RFP by ID",
+                "tags": [
+                    "RequestForProposals"
+                ],
+                "operationId": "GetRFP",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/contract": {
+            "post": {
+                "summary": "Send Contract",
+                "tags": [
+                    "Contracts"
+                ],
+                "operationId": "SendContract",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/SendContractRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get All Contracts",
+                "tags": [
+                    "Contracts"
+                ],
+                "operationId": "GetAllContracts",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/contract/{id}": {
+            "get": {
+                "summary": "Get Contract by ID",
+                "tags": [
+                    "Contracts"
+                ],
+                "operationId": "GetContract",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/po": {
+            "post": {
+                "summary": "Send PO",
+                "tags": [
+                    "PurchaseOrders"
+                ],
+                "operationId": "SendPO",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/SendPORequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get All POs",
+                "tags": [
+                    "PurchaseOrders"
+                ],
+                "operationId": "GetAllPOs",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/po/{id}": {
+            "get": {
+                "summary": "Get PO by ID",
+                "tags": [
+                    "PurchaseOrders"
+                ],
+                "operationId": "GetPurchaseOrder",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/proposal": {
+            "post": {
+                "summary": "Create Proposal",
+                "tags": [
+                    "Proposals"
+                ],
+                "operationId": "CreateProposal",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CreateProposalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get All Proposals",
+                "tags": [
+                    "Proposals"
+                ],
+                "operationId": "GetAllProposals",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/proposal/{id}": {
+            "get": {
+                "summary": "Get Proposal by ID",
+                "tags": [
+                    "Proposals"
+                ],
+                "operationId": "GetProposal",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "CreateRFPRequest": {
+            "title": "CreateRFPRequest",
+            "example": {
+                "rfpId": "6000000034",
+                "supplierId": "ACME GSheet",
+                "buyerId": "USMF - Contoso Entertainment System USA",
+                "items": [
+                    {
+                        "orderItemId": 1,
+                        "skuBuyer": "A0001",
+                        "skuSupplier": "A0001",
+                        "quantity": 1000,
+                        "unit": "PCs",
+                        "singlePrice": 0,
+                        "totalValue": 0,
+                        "currency": "USD"
+                    },
+                    {
+                        "orderItemId": 2,
+                        "skuBuyer": "A0002",
+                        "skuSupplier": "A0002",
+                        "quantity": 1000,
+                        "unit": "PCs",
+                        "singlePrice": 0,
+                        "totalValue": 0,
+                        "currency": "USD"
+                    }
+                ]
+            },
+            "type": "object",
+            "properties": {
+                "rfpId": {
+                    "type": "string"
+                },
+                "supplierId": {
+                    "type": "string"
+                },
+                "buyerId": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Item"
+                    }
+                }
+            },
+            "required": [
+                "rfpId",
+                "supplierId",
+                "buyerId",
+                "items"
+            ]
+        },
+        "Item": {
+            "title": "Item",
+            "example": {
+                "orderItemId": 1,
+                "skuBuyer": "A0001",
+                "skuSupplier": "A0001",
+                "quantity": 1000,
+                "unit": "PCs",
+                "singlePrice": 0,
+                "totalValue": 0,
+                "currency": "USD"
+            },
+            "type": "object",
+            "properties": {
+                "orderItemId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "skuBuyer": {
+                    "type": "string"
+                },
+                "skuSupplier": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "singlePrice": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalValue": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "currency": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "orderItemId",
+                "skuBuyer",
+                "skuSupplier",
+                "quantity",
+                "unit",
+                "singlePrice",
+                "totalValue",
+                "currency"
+            ]
+        },
+        "SendContractRequest": {
+            "title": "SendContractRequest",
+            "example": {
+                "contractId": "CID-007",
+                "supplierId": "ACME GSheet",
+                "buyerId": "USMF - Contoso Entertainment System USA",
+                "referencedProposalId": "P19433-12"
+            },
+            "type": "object",
+            "properties": {
+                "contractId": {
+                    "type": "string"
+                },
+                "supplierId": {
+                    "type": "string"
+                },
+                "buyerId": {
+                    "type": "string"
+                },
+                "referencedProposalId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "contractId",
+                "supplierId",
+                "buyerId",
+                "referencedProposalId"
+            ]
+        },
+        "SendPORequest": {
+            "title": "SendPORequest",
+            "example": {
+                "purchaseOrderId": "PO-007",
+                "supplierId": "ACME GSheet",
+                "buyerId": "USMF - Contoso Entertainment System USA",
+                "referencedContractId": "CID-007",
+                "items": [
+                    {
+                        "orderItemId": 1,
+                        "skuBuyer": "A0001",
+                        "skuSupplier": "A0001",
+                        "quantity": 1000,
+                        "unit": "PCs",
+                        "singlePrice": 0,
+                        "totalValue": 0,
+                        "currency": "USD"
+                    },
+                    {
+                        "orderItemId": 2,
+                        "skuBuyer": "A0002",
+                        "skuSupplier": "A0002",
+                        "quantity": 1000,
+                        "unit": "PCs",
+                        "singlePrice": 0,
+                        "totalValue": 0,
+                        "currency": "USD"
+                    }
+                ]
+            },
+            "type": "object",
+            "properties": {
+                "purchaseOrderId": {
+                    "type": "string"
+                },
+                "supplierId": {
+                    "type": "string"
+                },
+                "buyerId": {
+                    "type": "string"
+                },
+                "referencedContractId": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Item"
+                    }
+                }
+            },
+            "required": [
+                "purchaseOrderId",
+                "supplierId",
+                "buyerId",
+                "referencedContractId",
+                "items"
+            ]
+        },
+        "CreateProposalRequest": {
+            "title": "CreateProposalRequest",
+            "example": {
+                "proposalId": "P19433-12",
+                "supplierId": "ACME GSheet",
+                "buyerId": "USMF - Contoso Entertainment System USA",
+                "referencedRfpId": "6000000034",
+                "priceScales": [
+                    {
+                        "sku": {
+                            "productName": "HDMI 6' Cable",
+                            "buyerProductId": "A0001",
+                            "supplierProductId": "A0001"
+                        },
+                        "quantityFrom": 0,
+                        "quantityTo": 1000,
+                        "singlePrice": 0.9,
+                        "unit": "PC",
+                        "currency": "USD"
+                    },
+                    {
+                        "sku": {
+                            "productName": "HDMI 12' Cable",
+                            "buyerProductId": "A0002",
+                            "supplierProductId": "A0002"
+                        },
+                        "quantityFrom": 0,
+                        "quantityTo": 1000,
+                        "singlePrice": 1.94,
+                        "unit": "PC",
+                        "currency": "USD"
+                    }
+                ]
+            },
+            "type": "object",
+            "properties": {
+                "proposalId": {
+                    "type": "string"
+                },
+                "supplierId": {
+                    "type": "string"
+                },
+                "buyerId": {
+                    "type": "string"
+                },
+                "referencedRfpId": {
+                    "type": "string"
+                },
+                "priceScales": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PriceScale"
+                    }
+                }
+            },
+            "required": [
+                "proposalId",
+                "supplierId",
+                "buyerId",
+                "referencedRfpId",
+                "priceScales"
+            ]
+        },
+        "PriceScale": {
+            "title": "PriceScale",
+            "example": {
+                "sku": {
+                    "productName": "HDMI 6' Cable",
+                    "buyerProductId": "A0001",
+                    "supplierProductId": "A0001"
+                },
+                "quantityFrom": 0,
+                "quantityTo": 1000,
+                "singlePrice": 0.9,
+                "unit": "PC",
+                "currency": "USD"
+            },
+            "type": "object",
+            "properties": {
+                "sku": {
+                    "$ref": "#/definitions/Sku"
+                },
+                "quantityFrom": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "quantityTo": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "singlePrice": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "sku",
+                "quantityFrom",
+                "quantityTo",
+                "singlePrice",
+                "unit",
+                "currency"
+            ]
+        },
+        "Sku": {
+            "title": "Sku",
+            "example": {
+                "productName": "HDMI 6' Cable",
+                "buyerProductId": "A0001",
+                "supplierProductId": "A0001"
+            },
+            "type": "object",
+            "properties": {
+                "productName": {
+                    "type": "string"
+                },
+                "buyerProductId": {
+                    "type": "string"
+                },
+                "supplierProductId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "productName",
+                "buyerProductId",
+                "supplierProductId"
+            ]
+        }
+    }
+}
