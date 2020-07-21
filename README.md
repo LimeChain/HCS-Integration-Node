@@ -28,6 +28,10 @@ Hedera Consensus Service enables the HCSIN integration node to hold immutable pr
 - Ability to write arbitrary data
 - Ability to prove the sequence of events
 
+## Video showcase
+The process can be seen in action in the video below:
+[![](http://img.youtube.com/vi/r3U1Ui5TbJo/0.jpg)](http://www.youtube.com/watch?v=r3U1Ui5TbJo "Integrating Microsoft D365 and Google Sheets through Hedera Consensus Service")
+
 # Architecture Overview
 
 ## System context level
