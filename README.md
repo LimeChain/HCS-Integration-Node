@@ -12,14 +12,14 @@ As the business process and communication between two parties are likely to be s
 # Business Overview
 ## Benefits of synchronizing through HCSIN for the enterprises 
 The communication process between two companies normally involves a lot of manual work, paper trail and requires placing a trust factor in one of the participants. Naturally, manual processes tend to be slow and error-prone. 
-Synchronizing the internal systems of record for the companies allows for the following benefits to be achieved:
+Companies synchronizing their internal systems of record through HCSIN can reap the following benefits:
 ### Instant following of business processes
-With such a synchronization in place employees of enterprise A are no longer required to perform additional actions apart from working in their own system of record (ERP). 
-Without it, traditionally the employee needs to export the necessary business process artifacts (for example Purchase Order document) and send them through (normally) email. This introduces additional places for error and delays the business process execution and hinders automation. With HCSIN these delays can be eliminated and processes can be further automated.
+With such a synchronization in place, employees of enterprise A are no longer required to perform additional actions apart from working in their own system of record (ERP). 
+Without it, traditionally the employee needs to export the necessary business process artifacts (for example a Purchase Order document) and send them via (normally) email. This introduces an additional places for error, delays the business process execution and hinders automation. With HCSIN these delays can be eliminated and processes can be further automated.
 ### Non-repudiation
-Having the HCSIN system in place ensures non-repudiation through cryptography. Agreeing and proving an agreement that certain business process was followed are now governed by cryptographic signatures. No longer can one of the parties claim that they have not agreed a certain terms or processes. With HCSIN will no longer need to spend countless hours searching for the root of misunderstanding. HCSIN - through Hedera Consensus Service - will be able to prove exactly, who, when and what was agreed.
+Having the HCSIN system in place ensures non-repudiation through cryptography. Agreeing and proving an agreement that certain business process was correctly followed, are now governed by cryptographic signatures. No longer can one of the parties claim that they have not agreed to a certain terms or processes. With HCSIN in place one will no longer need to spend countless hours searching for the root cause of misunderstanding. HCSIN - through Hedera Consensus Service - will be able to prove exactly, who, when and what was agreed.
 ### Owning your data
-HCSIN puts the enterprise in complete control of their data. Unlike system of synchronization with a centralized element, all the data is transferred on a need-to-know basis - directly between the involved participants. Every enterprise runs and operates its own HCSIN and connects it to the necessary other parties. As HCSIN becomes part of the enterprise software system all the data is technically and logically contained and stored internally for the organisation.
+HCSIN puts the enterprise in complete control of their data. Unlike system of synchronization with a centralized element, all the data is transferred on a need-to-know basis - directly between the involved participants. Every enterprise runs and operates its own HCSIN and connects it to the necessary other parties HCSINs. As HCSIN becomes part of the enterprise software system, all the data is technically and logically contained and stored internally for the organisation.
 
 ## Technical advancements made possible by HCS
 Hedera Consensus Service enables the HCSIN integration node to hold immutable proof of the business process milestones reached. HCS offers the unique blend of:
