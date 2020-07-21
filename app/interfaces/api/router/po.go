@@ -33,7 +33,7 @@ type requestOrderItem struct {
 
 type storedPOsResponse struct {
 	api.IntegrationNodeAPIResponse
-	PurchaseOrders []*purchaseOrderModel.PurchaseOrder `json:"contracts"`
+	PurchaseOrders []*purchaseOrderModel.PurchaseOrder `json:"pos"`
 }
 
 type storedPOResponse struct {
