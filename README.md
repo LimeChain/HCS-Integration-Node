@@ -7,7 +7,26 @@ The goal of the HCS Integration Node (HCSIN) is to be a reusable piece in a syst
 As the business process and communication between two parties are likely to be sensitive in nature (or lead to losses if publicly available) several approach decisions are made:
 
 - The public ledger (HCS) is not the storage of documents nor the main communication layer. The ledger is an immutable trustless source of truth of what crypto-graphical proofs were stored and when. Milestones are recorded in the form of SHA-256 hashes and the necessary crypto-graphical key signatures (indicating milestone agreement)
-- The actual document transfer and following of business process logic happen inside the HCS Integration node. The HCS integration node has a p2p messaging component allowing both parties to communicate directly with each other. Every party also has its own storage system allowing for the party to store business process artifacts independently.
+- The actual document transfer and following of business process logic happens inside the HCS Integration node. The HCS integration node has a p2p messaging component allowing both parties to communicate directly with each other. Every party also has its own storage system allowing for the party to store business process artifacts independently.
+
+# Business Overview
+## Benefits of synchronizing through HCSIN for the enterprises 
+The communication process between two companies normally involves a lot of manual work, paper trail and requires placing a trust factor in one of the participants. Naturally, manual processes tend to be slow and error-prone. 
+Synchronizing the internal systems of record for the companies allows for the following benefits to be achieved:
+### Instant following of business processes
+With such a synchronization in place employees of enterprise A are no longer required to perform additional actions apart from working in their own system of record (ERP). 
+Without it, traditionally the employee needs to export the necessary business process artifacts (for example Purchase Order document) and send them through (normally) email. This introduces additional places for error and delays the business process execution and hinders automation. With HCSIN these delays can be eliminated and processes can be further automated.
+### Non-repudiation
+Having the HCSIN system in place ensures non-repudiation through cryptography. Agreeing and proving an agreement that certain business process was followed are now governed by cryptographic signatures. No longer can one of the parties claim that they have not agreed a certain terms or processes. With HCSIN will no longer need to spend countless hours searching for the root of misunderstanding. HCSIN - through Hedera Consensus Service - will be able to prove exactly, who, when and what was agreed.
+### Owning your data
+HCSIN puts the enterprise in complete control of their data. Unlike system of synchronization with a centralized element, all the data is transferred on a need-to-know basis - directly between the involved participants. Every enterprise runs and operates its own HCSIN and connects it to the necessary other parties. As HCSIN becomes part of the enterprise software system all the data is technically and logically contained and stored internally for the organisation.
+
+## Technical advancements made possible by HCS
+Hedera Consensus Service enables the HCSIN integration node to hold immutable proof of the business process milestones reached. HCS offers the unique blend of:
+- High network speed - very swift confirmation
+- Very low cost per transaction
+- Ability to write arbitrary data
+- Ability to prove the sequence of events
 
 # Architecture Overview
 
