@@ -1,12 +1,13 @@
 package router
 
 import (
-	"github.com/go-chi/chi"
-	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/go-chi/chi"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func NewSwaggerRouter() http.Handler {

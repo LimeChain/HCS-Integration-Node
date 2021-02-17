@@ -5,12 +5,14 @@ import (
 	"context"
 	"crypto/ed25519"
 	"fmt"
+
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
+	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	"github.com/multiformats/go-multiaddr"
 	log "github.com/sirupsen/logrus"
 )
@@ -27,7 +29,7 @@ func handleIncommingMessage(messagesReadWriter *bufio.ReadWriter, receiver commo
 		for {
 			msg, err := messagesReadWriter.ReadBytes('\n')
 			if err != nil {
-				panic(err)
+				return
 			}
 
 			receiver.Receive(&common.Message{Ctx: context.Background(), Msg: msg})
@@ -85,34 +87,34 @@ func NewLibP2PClient(key ed25519.PrivateKey, listenIp, listenPort, peerMultiAddr
 
 	client := &LibP2PClient{h: h}
 
-	if len(peerMultiAddr) == 0 {
-		return client
-	}
+	return client
+}
 
+func MultiAddrToPeerInfo(peerMultiAddr string) (*peer.AddrInfo, error) {
 	maddr, err := multiaddr.NewMultiaddr(peerMultiAddr)
 	if err != nil {
-		log.Fatalln(err)
+		log.Errorln(err)
 	}
 
 	info, err := peer.AddrInfoFromP2pAddr(maddr)
 	if err != nil {
-		log.Fatalln(err)
+		log.Errorln(err)
 	}
 
-	err = h.Connect(context.Background(), *info)
-	if err != nil {
-		panic(err)
-	}
+	return info, err
+}
 
-	log.Infof("[LIBP2P] Connected to peer: %s\n", peerMultiAddr)
+func Connect(client *LibP2PClient, ai peer.AddrInfo) error {
+	client.h.Peerstore().AddAddrs(ai.ID, ai.Addrs, peerstore.TempAddrTTL)
 
-	s, err := h.NewStream(context.Background(), info.ID, p2pStreamName)
+	log.Printf("This is a conversation between %s and %s\n", client.h.ID(), ai.ID)
+
+	s, err := client.h.NewStream(context.Background(), ai.ID, p2pStreamName)
 	if err != nil {
-		panic(err)
+		log.Errorln(err)
 	}
 
 	client.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
 
-	return client
-
+	return err
 }

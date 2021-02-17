@@ -6,4 +6,5 @@ const (
 	RouteContract = "contract"
 	RoutePO       = "po"
 	Swagger       = "swagger"
+	Node          = "node"
 )

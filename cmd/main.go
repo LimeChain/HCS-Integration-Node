@@ -5,6 +5,8 @@ import (
 	"crypto/ed25519"
 	"encoding/hex"
 	"fmt"
+	"os"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/apiservices"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
@@ -29,7 +31,6 @@ import (
 	rfpMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func setupP2PClient(
@@ -40,7 +41,7 @@ func setupP2PClient(
 	contractRepo contractRepository.ContractsRepository,
 	cs *contractService.ContractService,
 	por poRepository.PurchaseOrdersRepository,
-	pos *poService.PurchaseOrderService) common.Messenger {
+	pos *poService.PurchaseOrderService) *libp2p.LibP2PClient {
 
 	listenPort := os.Getenv("P2P_PORT")
 	listenIp := os.Getenv("P2P_IP")
@@ -181,11 +182,14 @@ func main() {
 	contractApiService := apiservices.NewContractService(contractRepo, cs, p2pClient)
 	purchaseOrderApiService := apiservices.NewPurchaseOrderService(por, pos, p2pClient)
 
+	nodeApiService := apiservices.NewNodeService(p2pClient)
+
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteRFP), apiRouter.NewRFPRouter(rfpApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteProposal), apiRouter.NewProposalsRouter(proposalApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteContract), apiRouter.NewContractsRouter(contractApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RoutePO), apiRouter.NewPurchaseOrdersRouter(purchaseOrderApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.Swagger), apiRouter.NewSwaggerRouter())
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.Node), apiRouter.NewNodeRouter(nodeApiService))
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)

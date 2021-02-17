@@ -4,6 +4,8 @@ type BusinessMessage struct {
 	Type string `json:"type"`
 }
 
+const P2PConnectNodeType = "node"
+
 const (
 	P2PMessageTypeRFP              = "rfp"
 	P2PMessageTypeProposal         = "proposal"
