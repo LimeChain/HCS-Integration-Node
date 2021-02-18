@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"crypto/ed25519"
+	"errors"
 	"fmt"
 
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
@@ -22,6 +23,7 @@ const p2pStreamName = "/hcs-int-p2p-nodes/1.0.0"
 type LibP2PClient struct {
 	h                  host.Host
 	messagesReadWriter *bufio.ReadWriter
+	receiver           common.MessageReceiver
 }
 
 func handleIncommingMessage(messagesReadWriter *bufio.ReadWriter, receiver common.MessageReceiver) {
@@ -38,10 +40,7 @@ func handleIncommingMessage(messagesReadWriter *bufio.ReadWriter, receiver commo
 }
 
 func (c *LibP2PClient) Listen(receiver common.MessageReceiver) error {
-	if c.messagesReadWriter != nil { // I've started the stream and have readwriter available
-		handleIncommingMessage(c.messagesReadWriter, receiver)
-		return nil
-	}
+	c.receiver = receiver
 
 	c.h.SetStreamHandler(p2pStreamName, func(s network.Stream) { // I'm waiting for incomming connection
 		c.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
@@ -105,6 +104,12 @@ func MultiAddrToPeerInfo(peerMultiAddr string) (*peer.AddrInfo, error) {
 }
 
 func Connect(client *LibP2PClient, ai peer.AddrInfo) error {
+	if client.receiver == nil {
+		errMsg := "Missing a client receiver. Listen function should be executed, firstly."
+		log.Errorln(errMsg)
+		return errors.New(errMsg)
+	}
+
 	client.h.Peerstore().AddAddrs(ai.ID, ai.Addrs, peerstore.TempAddrTTL)
 
 	log.Printf("This is a conversation between %s and %s\n", client.h.ID(), ai.ID)
@@ -115,6 +120,7 @@ func Connect(client *LibP2PClient, ai peer.AddrInfo) error {
 	}
 
 	client.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
+	handleIncommingMessage(client.messagesReadWriter, client.receiver)
 
 	return err
 }

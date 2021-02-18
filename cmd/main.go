@@ -49,6 +49,11 @@ func setupP2PClient(
 
 	p2pClient := libp2p.NewLibP2PClient(prvKey, listenIp, listenPort, peerMultiAddr)
 
+	if len(peerMultiAddr) != 0 {
+		targetPeerInfo, _ := libp2p.MultiAddrToPeerInfo(peerMultiAddr)
+		_ = libp2p.Connect(p2pClient, *targetPeerInfo)
+	}
+
 	// TODO get some env variables
 	// TODO add more handlers
 	rfpHandler := handler.NewRFPHandler(rfpRepo)
