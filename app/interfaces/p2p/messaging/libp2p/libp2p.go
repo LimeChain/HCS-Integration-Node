@@ -64,7 +64,7 @@ func (c *LibP2PClient) Close() error {
 	return nil
 }
 
-func NewLibP2PClient(key ed25519.PrivateKey, listenIp, listenPort, peerMultiAddr string) *LibP2PClient {
+func NewLibP2PClient(key ed25519.PrivateKey, listenIp string, listenPort string) *LibP2PClient {
 	libp2pKey, err := crypto.UnmarshalEd25519PrivateKey(key)
 	if err != nil {
 		panic(err)

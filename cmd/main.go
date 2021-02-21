@@ -45,14 +45,8 @@ func setupP2PClient(
 
 	listenPort := os.Getenv("P2P_PORT")
 	listenIp := os.Getenv("P2P_IP")
-	peerMultiAddr := os.Getenv("PEER_ADDRESS")
 
-	p2pClient := libp2p.NewLibP2PClient(prvKey, listenIp, listenPort, peerMultiAddr)
-
-	if len(peerMultiAddr) != 0 {
-		targetPeerInfo, _ := libp2p.MultiAddrToPeerInfo(peerMultiAddr)
-		_ = libp2p.Connect(p2pClient, *targetPeerInfo)
-	}
+	p2pClient := libp2p.NewLibP2PClient(prvKey, listenIp, listenPort)
 
 	// TODO get some env variables
 	// TODO add more handlers
