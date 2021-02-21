@@ -32,9 +32,7 @@ func handleIncommingMessage(c *LibP2PClient, receiver common.MessageReceiver) {
 		for {
 			msg, err := c.messagesReadWriter.ReadBytes('\n')
 			if err != nil {
-				fmt.Println("handleIncommingMessage error")
 				c.streamPairs[c.h.ID()] = ""
-				fmt.Println(c.streamPairs[c.h.ID()])
 				return
 			}
 
@@ -49,12 +47,8 @@ func (c *LibP2PClient) Listen(receiver common.MessageReceiver) error {
 	c.h.SetStreamHandler(p2pStreamName, func(s network.Stream) { // I'm waiting for incomming connection
 		c.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
 		handleIncommingMessage(c, receiver)
-		fmt.Println("UDRI BA4e FILIO")
-		fmt.Println(s.ID())
 
 		c.streamPairs[c.h.ID()] = s.ID()
-		fmt.Println(c.streamPairs[c.h.ID()])
-
 	})
 	return nil
 }
