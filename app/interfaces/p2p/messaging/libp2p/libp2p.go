@@ -122,6 +122,7 @@ func Connect(client *LibP2PClient, ai peer.AddrInfo) error {
 	s, err := client.h.NewStream(context.Background(), ai.ID, p2pStreamName)
 	if err != nil {
 		log.Errorln(err)
+		return err
 	}
 
 	client.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
@@ -129,5 +130,5 @@ func Connect(client *LibP2PClient, ai peer.AddrInfo) error {
 
 	client.streamPairs[ai.ID] = s.ID()
 
-	return err
+	return nil
 }
