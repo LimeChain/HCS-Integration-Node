@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"crypto/ed25519"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -54,7 +55,16 @@ func (c *LibP2PClient) Listen(receiver common.MessageReceiver) error {
 }
 
 func (c *LibP2PClient) Send(msg *common.Message) error {
-	c.messagesReadWriter.Write(msg.Msg)
+	var signedMessageBytes []byte
+	var err error
+
+	signedMessageBytes, err = json.Marshal(msg)
+	if err != nil {
+		print(err)
+		return err
+	}
+
+	c.messagesReadWriter.Write(signedMessageBytes)
 	c.messagesReadWriter.WriteByte('\n')
 	c.messagesReadWriter.Flush()
 	return nil
