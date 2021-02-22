@@ -18,13 +18,9 @@ type Message struct {
 
 	Ctx context.Context // Hold context variables like who has sent it if needed for the future
 	// Read more https://medium.com/@cep21/how-to-correctly-use-context-context-in-go-1-7-8f2c0fafdf39
-
-	Signature  []byte
-	PeerId     peer.ID
-	PubKeyData []byte
 }
 
-type P2PMessage struct {
+type SignedMessage struct {
 	Msg        []byte
 	Signature  []byte
 	PeerId     peer.ID
