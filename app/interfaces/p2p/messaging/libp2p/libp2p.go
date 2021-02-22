@@ -2,11 +2,13 @@ package libp2p
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"crypto/ed25519"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 	"github.com/libp2p/go-libp2p"
@@ -37,7 +39,20 @@ func handleIncommingMessage(c *LibP2PClient, receiver common.MessageReceiver) {
 				return
 			}
 
-			receiver.Receive(&common.Message{Ctx: context.Background(), Msg: msg})
+			rawMessage := strings.TrimSpace(string(msg))
+			fmt.Println(rawMessage)
+
+			if len(rawMessage) == 0 {
+				return
+			}
+
+			var signedMessage common.P2PMessage
+			err = json.Unmarshal([]byte(rawMessage), &signedMessage)
+			fmt.Println(err)
+
+			fmt.Println(string(signedMessage.Msg))
+
+			receiver.Receive(&common.Message{Ctx: context.Background(), Msg: signedMessage.Msg})
 		}
 	}()
 }
@@ -55,20 +70,61 @@ func (c *LibP2PClient) Listen(receiver common.MessageReceiver) error {
 }
 
 func (c *LibP2PClient) Send(msg *common.Message) error {
-	var signedMessageBytes []byte
-	var err error
-
-	signedMessageBytes, err = json.Marshal(msg)
+	signature, err := c.signData(msg.Msg)
 	if err != nil {
-		print(err)
 		return err
 	}
+
+	fmt.Println(signature)
+
+	nodePubKey, _ := c.h.Peerstore().PubKey(c.h.ID()).Bytes()
+
+	msg.Signature = signature
+	msg.PubKeyData = nodePubKey
+	msg.PeerId = c.h.ID()
+
+	peerId := c.h.ID()
+
+	p2pMessage := &common.P2PMessage{Signature: signature, PubKeyData: nodePubKey, PeerId: peerId, Msg: msg.Msg}
+
+	signedMessage := new(bytes.Buffer)
+	json.NewEncoder(signedMessage).Encode(p2pMessage)
+	signedMessageBytes := signedMessage.Bytes()
 
 	c.messagesReadWriter.Write(signedMessageBytes)
 	c.messagesReadWriter.WriteByte('\n')
 	c.messagesReadWriter.Flush()
 	return nil
 }
+
+// sign binary data using the local node's private key
+func (c *LibP2PClient) signData(data []byte) ([]byte, error) {
+	key := c.h.Peerstore().PrivKey(c.h.ID())
+	res, err := key.Sign(data)
+	return res, err
+}
+
+// func (c *LibP2PClient) SendSignedMessage(msg *common.Message) error {
+// 	signature, err := c.signData(msg.Msg)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	fmt.Println(signature)
+
+// 	nodePubKey, _ := c.h.Peerstore().PubKey(c.h.ID()).Bytes()
+
+// 	signedMessage := &common.SignedMessage{Signature: signature, PeerId: c.h.ID(), NodePubKey: nodePubKey}
+// 	reqBodyBytes := new(bytes.Buffer)
+// 	json.NewEncoder(reqBodyBytes).Encode(signedMessage)
+
+// 	signedMessageBytes := reqBodyBytes.Bytes() // this is the []byte
+
+// 	c.messagesReadWriter.Write(signedMessageBytes)
+// 	c.messagesReadWriter.WriteByte('\n')
+// 	c.messagesReadWriter.Flush()
+// 	return nil
+// }
 
 func (c *LibP2PClient) Close() error {
 	return nil

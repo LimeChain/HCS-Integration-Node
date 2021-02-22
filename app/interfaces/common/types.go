@@ -24,6 +24,13 @@ type Message struct {
 	PubKeyData []byte
 }
 
+type P2PMessage struct {
+	Msg        []byte
+	Signature  []byte
+	PeerId     peer.ID
+	PubKeyData []byte
+}
+
 type MessageReceiver interface {
 	Receive(msg *Message)
 }

@@ -1,8 +1,8 @@
 package apiservices
 
 import (
-	"context"
 	"encoding/json"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	contractModel "github.com/Limechain/HCS-Integration-Node/app/domain/contract/model"
 	contractRepo "github.com/Limechain/HCS-Integration-Node/app/domain/contract/repository"
@@ -44,7 +44,7 @@ func (s *ContractService) SaveAndSendContract(unsignedContract *contractModel.Un
 		// TODO delete from db if cannot marshal
 		return "", "", "", err
 	}
-	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	s.p2pClient.Send(&common.Message{Msg: p2pBytes})
 	return contractId, contractHash, contractSignature, nil
 }
 

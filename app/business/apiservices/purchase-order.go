@@ -1,8 +1,8 @@
 package apiservices
 
 import (
-	"context"
 	"encoding/json"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	poModel "github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/model"
 	poRepo "github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/repository"
@@ -44,7 +44,7 @@ func (s *PurchaseOrderService) SaveAndSendPurchaseOrder(unsignedPurchaseOrder *p
 		// TODO delete from db if cannot marshal
 		return "", "", "", err
 	}
-	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	s.p2pClient.Send(&common.Message{Msg: p2pBytes})
 	return purchaseOrderId, purchaseOrderHash, purchaseOrderSignature, nil
 }
 

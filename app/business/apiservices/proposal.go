@@ -1,8 +1,8 @@
 package apiservices
 
 import (
-	"context"
 	"encoding/json"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	proposalModel "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/model"
 	repository "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/repository"
@@ -33,7 +33,7 @@ func (s *ProposalService) CreateProposal(proposal *proposalModel.Proposal) (id s
 		// TODO delete from db if cannot marshal
 		return "", err
 	}
-	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	s.p2pClient.Send(&common.Message{Msg: p2pBytes})
 	return proposalId, nil
 }
 
