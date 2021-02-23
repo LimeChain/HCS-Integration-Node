@@ -42,6 +42,14 @@ func handleIncommingMessage(c *LibP2PClient, receiver common.MessageReceiver) {
 			err = json.Unmarshal(msg, &signedMessage)
 			if err != nil {
 				log.Error(err)
+				continue
+			}
+
+			validData := c.verifyData(signedMessage.Msg, signedMessage.Signature, signedMessage.PeerId, signedMessage.PubKeyData)
+
+			if !validData {
+				log.Error("The data integrity is suspicious")
+				continue
 			}
 
 			receiver.Receive(&common.Message{Ctx: context.Background(), Msg: signedMessage.Msg})
@@ -73,11 +81,9 @@ func (c *LibP2PClient) Send(msg *common.Message) error {
 
 	p2pMessage := &common.SignedMessage{Signature: signature, PubKeyData: nodePubKey, PeerId: peerId, Msg: msg.Msg}
 
-	signedMessage := new(bytes.Buffer)
-	json.NewEncoder(signedMessage).Encode(p2pMessage)
-	signedMessageBytes := signedMessage.Bytes()
+	signedMessage := EncodeToBytes(p2pMessage)
 
-	c.messagesReadWriter.Write(signedMessageBytes)
+	c.messagesReadWriter.Write(signedMessage)
 	c.messagesReadWriter.Flush()
 	return nil
 }
@@ -87,6 +93,52 @@ func (c *LibP2PClient) signData(data []byte) ([]byte, error) {
 	key := c.h.Peerstore().PrivKey(c.h.ID())
 	res, err := key.Sign(data)
 	return res, err
+}
+
+// Verify incoming p2p message data integrity
+// data: data to verify
+// signature: author signature provided in the message payload
+// peerId: author peer id from the message payload
+// pubKeyData: author public key from the message payload
+func (c *LibP2PClient) verifyData(data []byte, signature []byte, peerId peer.ID, pubKeyData []byte) bool {
+	key, err := crypto.UnmarshalPublicKey(pubKeyData)
+	if err != nil {
+		log.Error(err, "Failed to extract key from message key data")
+		return false
+	}
+
+	// extract node id from the provided public key
+	idFromKey, err := peer.IDFromPublicKey(key)
+
+	if err != nil {
+		log.Error(err, "Failed to extract peer id from public key")
+		return false
+	}
+
+	// verify that message author node id matches the provided node public key
+	if idFromKey != peerId {
+		log.Error(err, "Node id and provided public key mismatch")
+		return false
+	}
+
+	res, err := key.Verify(data, signature)
+	if err != nil {
+		log.Error(err, "Error authenticating data")
+		return false
+	}
+
+	return res
+}
+
+func EncodeToBytes(p interface{}) []byte {
+	buf := bytes.Buffer{}
+	enc := json.NewEncoder(&buf)
+	err := enc.Encode(p)
+	if err != nil {
+		log.Error(err)
+	}
+
+	return buf.Bytes()
 }
 
 func (c *LibP2PClient) Close() error {
