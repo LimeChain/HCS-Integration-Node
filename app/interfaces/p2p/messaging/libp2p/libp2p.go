@@ -38,21 +38,14 @@ func handleIncommingMessage(c *LibP2PClient, receiver common.MessageReceiver) {
 				return
 			}
 
-			var signedMessage common.SignedMessage
-			err = json.Unmarshal(msg, &signedMessage)
-			if err != nil {
-				log.Error(err)
-				continue
-			}
-
-			validData := c.verifyData(signedMessage.Msg, signedMessage.Signature, signedMessage.PeerId, signedMessage.PubKeyData)
+			rawMessage, validData := c.verifySignedMessage(msg)
 
 			if !validData {
 				log.Error("The data integrity is suspicious")
 				continue
 			}
 
-			receiver.Receive(&common.Message{Ctx: context.Background(), Msg: signedMessage.Msg})
+			receiver.Receive(&common.Message{Ctx: context.Background(), Msg: rawMessage})
 		}
 	}()
 }
@@ -70,10 +63,35 @@ func (c *LibP2PClient) Listen(receiver common.MessageReceiver) error {
 }
 
 func (c *LibP2PClient) Send(msg *common.Message) error {
-	signature, err := c.signData(msg.Msg)
+	signedMessage, err := c.prepareSignedMessage(msg)
 	if err != nil {
 		log.Error(err)
 		return err
+	}
+
+	c.messagesReadWriter.Write(signedMessage)
+	c.messagesReadWriter.Flush()
+	return nil
+}
+
+func (c *LibP2PClient) verifySignedMessage(msg []byte) ([]byte, bool) {
+	var signedMessage common.SignedMessage
+	err := json.Unmarshal(msg, &signedMessage)
+	if err != nil {
+		log.Error(err)
+		return nil, false
+	}
+
+	isValid := c.verifyData(signedMessage.Msg, signedMessage.Signature, signedMessage.PeerId, signedMessage.PubKeyData)
+
+	return signedMessage.Msg, isValid
+}
+
+func (c *LibP2PClient) prepareSignedMessage(msg *common.Message) ([]byte, error) {
+	signature, err := c.signData(msg.Msg)
+	if err != nil {
+		log.Error(err)
+		return nil, err
 	}
 
 	nodePubKey, _ := c.h.Peerstore().PubKey(c.h.ID()).Bytes()
@@ -83,9 +101,7 @@ func (c *LibP2PClient) Send(msg *common.Message) error {
 
 	signedMessage := EncodeToBytes(p2pMessage)
 
-	c.messagesReadWriter.Write(signedMessage)
-	c.messagesReadWriter.Flush()
-	return nil
+	return signedMessage, nil
 }
 
 // sign binary data using the local node's private key
