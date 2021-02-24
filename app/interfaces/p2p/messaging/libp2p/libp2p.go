@@ -75,16 +75,16 @@ func (c *LibP2PClient) Send(msg *common.Message) error {
 }
 
 func (c *LibP2PClient) verifySignedMessage(msg []byte) ([]byte, bool) {
-	var signedMessage common.SignedMessage
-	err := json.Unmarshal(msg, &signedMessage)
+	var envelope common.Envelope
+	err := json.Unmarshal(msg, &envelope)
 	if err != nil {
 		log.Error(err)
 		return nil, false
 	}
 
-	isValid := c.verifyData(signedMessage.Msg, signedMessage.Signature, signedMessage.PeerId, signedMessage.PubKeyData)
+	isValid := c.verifyData(envelope.Payload, envelope.Signature, envelope.PeerId, envelope.PubKeyData)
 
-	return signedMessage.Msg, isValid
+	return envelope.Payload, isValid
 }
 
 func (c *LibP2PClient) prepareSignedMessage(msg *common.Message) ([]byte, error) {
@@ -97,7 +97,7 @@ func (c *LibP2PClient) prepareSignedMessage(msg *common.Message) ([]byte, error)
 	nodePubKey, _ := c.h.Peerstore().PubKey(c.h.ID()).Bytes()
 	peerId := c.h.ID()
 
-	p2pMessage := &common.SignedMessage{Signature: signature, PubKeyData: nodePubKey, PeerId: peerId, Msg: msg.Msg}
+	p2pMessage := &common.Envelope{Signature: signature, PubKeyData: nodePubKey, PeerId: peerId, Payload: msg.Msg}
 
 	signedMessage := EncodeToBytes(p2pMessage)
 
