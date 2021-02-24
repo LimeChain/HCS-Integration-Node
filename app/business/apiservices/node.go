@@ -3,32 +3,27 @@ package apiservices
 import (
 	"errors"
 
-	"github.com/Limechain/HCS-Integration-Node/app/interfaces/p2p/messaging/libp2p"
+	"github.com/Limechain/HCS-Integration-Node/app/interfaces/common"
 )
 
 type NodeService struct {
-	p2pClient *libp2p.LibP2PClient
+	messenger common.Messenger
 }
 
-func (s *NodeService) Connect(peerAddress string) error {
+func (s *NodeService) Connect(peerAddress string) (bool, error) {
 	if len(peerAddress) == 0 {
-		return errors.New("Missing peer address information")
+		return false, errors.New("Missing peer address information")
 	}
 
-	targetPeerInfo, err := libp2p.MultiAddrToPeerInfo(peerAddress)
-	if err != nil {
-		return err
-	}
-
-	err = libp2p.Connect(s.p2pClient, *targetPeerInfo)
+	connected, err := s.messenger.Connect(peerAddress)
 
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	return connected, nil
 }
 
-func NewNodeService(p2pClient *libp2p.LibP2PClient) *NodeService {
-	return &NodeService{p2pClient: p2pClient}
+func NewNodeService(messenger common.Messenger) *NodeService {
+	return &NodeService{messenger: messenger}
 }

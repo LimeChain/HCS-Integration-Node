@@ -35,13 +35,13 @@ import (
 
 func setupP2PClient(
 	prvKey ed25519.PrivateKey,
-	hcsClient common.Messenger,
+	hcsClient common.DLTMessenger,
 	rfpRepo rfpRepository.RFPRepository,
 	proposalRepo proposalRepository.ProposalRepository,
 	contractRepo contractRepository.ContractsRepository,
 	cs *contractService.ContractService,
 	por poRepository.PurchaseOrdersRepository,
-	pos *poService.PurchaseOrderService) *libp2p.LibP2PClient {
+	pos *poService.PurchaseOrderService) common.Messenger {
 
 	listenPort := os.Getenv("P2P_PORT")
 	listenIp := os.Getenv("P2P_IP")
@@ -82,7 +82,7 @@ func setupDLTClient(
 	contractRepo contractRepository.ContractsRepository,
 	cs *contractService.ContractService,
 	por poRepository.PurchaseOrdersRepository,
-	pos *poService.PurchaseOrderService) common.Messenger {
+	pos *poService.PurchaseOrderService) common.DLTMessenger {
 
 	shouldConnectToMainnet := (os.Getenv("HCS_MAINNET") == "true")
 	hcsClientID := os.Getenv("HCS_CLIENT_ID")

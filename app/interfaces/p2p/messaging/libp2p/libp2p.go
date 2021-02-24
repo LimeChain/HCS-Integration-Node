@@ -64,6 +64,51 @@ func (c *LibP2PClient) Close() error {
 	return nil
 }
 
+func (c *LibP2PClient) multiAddrToPeerInfo(peerMultiAddr string) (*peer.AddrInfo, error) {
+	maddr, err := multiaddr.NewMultiaddr(peerMultiAddr)
+	if err != nil {
+		log.Errorln(err)
+	}
+
+	info, err := peer.AddrInfoFromP2pAddr(maddr)
+	if err != nil {
+		log.Errorln(err)
+	}
+
+	return info, err
+}
+
+func (c *LibP2PClient) Connect(peerAddress string) (bool, error) {
+	if c.receiver == nil {
+		errMsg := "Missing a client receiver. Listen function should be executed, firstly."
+		log.Errorln(errMsg)
+		return false, errors.New(errMsg)
+	}
+
+	ai, err := c.multiAddrToPeerInfo(peerAddress)
+	if err != nil {
+		log.Errorln(err)
+		return false, err
+	}
+
+	c.h.Peerstore().AddAddrs(ai.ID, ai.Addrs, peerstore.TempAddrTTL)
+
+	log.Printf("This is a conversation between %s and %s\n", c.h.ID(), ai.ID)
+
+	s, err := c.h.NewStream(context.Background(), ai.ID, p2pStreamName)
+	if err != nil {
+		log.Errorln(err)
+		return false, err
+	}
+
+	c.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
+	handleIncommingMessage(c, c.receiver)
+
+	c.streamPairs[ai.ID] = s.ID()
+
+	return true, nil
+}
+
 func NewLibP2PClient(key ed25519.PrivateKey, listenIp string, listenPort string) *LibP2PClient {
 	libp2pKey, err := crypto.UnmarshalEd25519PrivateKey(key)
 	if err != nil {
@@ -92,43 +137,4 @@ func NewLibP2PClient(key ed25519.PrivateKey, listenIp string, listenPort string)
 	client.streamPairs = make(map[peer.ID]string)
 
 	return client
-}
-
-func MultiAddrToPeerInfo(peerMultiAddr string) (*peer.AddrInfo, error) {
-	maddr, err := multiaddr.NewMultiaddr(peerMultiAddr)
-	if err != nil {
-		log.Errorln(err)
-	}
-
-	info, err := peer.AddrInfoFromP2pAddr(maddr)
-	if err != nil {
-		log.Errorln(err)
-	}
-
-	return info, err
-}
-
-func Connect(client *LibP2PClient, ai peer.AddrInfo) error {
-	if client.receiver == nil {
-		errMsg := "Missing a client receiver. Listen function should be executed, firstly."
-		log.Errorln(errMsg)
-		return errors.New(errMsg)
-	}
-
-	client.h.Peerstore().AddAddrs(ai.ID, ai.Addrs, peerstore.TempAddrTTL)
-
-	log.Printf("This is a conversation between %s and %s\n", client.h.ID(), ai.ID)
-
-	s, err := client.h.NewStream(context.Background(), ai.ID, p2pStreamName)
-	if err != nil {
-		log.Errorln(err)
-		return err
-	}
-
-	client.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
-	handleIncommingMessage(client, client.receiver)
-
-	client.streamPairs[ai.ID] = s.ID()
-
-	return nil
 }

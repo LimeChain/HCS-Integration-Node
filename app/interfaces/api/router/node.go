@@ -13,7 +13,7 @@ import (
 )
 
 type ConnectPeerRequest struct {
-	PeerAddress string `json:"peerAddress" bson:"peerAddress"`
+	PeerAddresses []string `json:"peerAddresses" bson:"peerAddresses"`
 }
 
 type connectPeerResponse struct {
@@ -38,8 +38,14 @@ func connectPeer(nodeService *apiservices.NodeService) func(w http.ResponseWrite
 			return
 		}
 
-		peerAddress := connectPeerRequest.PeerAddress
-		err = nodeService.Connect(peerAddress)
+		peerAddresses := connectPeerRequest.PeerAddresses
+		for _, peerAddress := range peerAddresses {
+			// ToDo: Handle the returned value
+			_, err = nodeService.Connect(peerAddress)
+			if err != nil {
+				return
+			}
+		}
 
 		if err != nil {
 			render.JSON(w, r, connectPeerResponse{api.IntegrationNodeAPIResponse{Status: false, Error: err.Error()}})
