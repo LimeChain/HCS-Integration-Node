@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/service"
@@ -13,7 +14,7 @@ import (
 
 type PurchaseOrderAcceptedHandler struct {
 	por       repository.PurchaseOrdersRepository
-	dltClient common.Messenger
+	dltClient common.DLTMessenger
 	pos       *service.PurchaseOrderService
 }
 
@@ -82,6 +83,6 @@ func (h *PurchaseOrderAcceptedHandler) Handle(msg *common.Message) error {
 	return nil
 }
 
-func NewPOAcceptedHandler(por repository.PurchaseOrdersRepository, pos *service.PurchaseOrderService, dltClient common.Messenger) *PurchaseOrderAcceptedHandler {
+func NewPOAcceptedHandler(por repository.PurchaseOrdersRepository, pos *service.PurchaseOrderService, dltClient common.DLTMessenger) *PurchaseOrderAcceptedHandler {
 	return &PurchaseOrderAcceptedHandler{por: por, pos: pos, dltClient: dltClient}
 }

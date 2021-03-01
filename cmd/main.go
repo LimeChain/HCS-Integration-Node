@@ -5,6 +5,8 @@ import (
 	"crypto/ed25519"
 	"encoding/hex"
 	"fmt"
+	"os"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/apiservices"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler"
 	"github.com/Limechain/HCS-Integration-Node/app/business/handler/parser/json"
@@ -29,12 +31,11 @@ import (
 	rfpMongo "github.com/Limechain/HCS-Integration-Node/app/persistance/mongodb/rfp"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func setupP2PClient(
 	prvKey ed25519.PrivateKey,
-	hcsClient common.Messenger,
+	hcsClient common.DLTMessenger,
 	rfpRepo rfpRepository.RFPRepository,
 	proposalRepo proposalRepository.ProposalRepository,
 	contractRepo contractRepository.ContractsRepository,
@@ -44,9 +45,8 @@ func setupP2PClient(
 
 	listenPort := os.Getenv("P2P_PORT")
 	listenIp := os.Getenv("P2P_IP")
-	peerMultiAddr := os.Getenv("PEER_ADDRESS")
 
-	p2pClient := libp2p.NewLibP2PClient(prvKey, listenIp, listenPort, peerMultiAddr)
+	p2pClient := libp2p.NewLibP2PClient(prvKey, listenIp, listenPort)
 
 	// TODO get some env variables
 	// TODO add more handlers
@@ -82,7 +82,7 @@ func setupDLTClient(
 	contractRepo contractRepository.ContractsRepository,
 	cs *contractService.ContractService,
 	por poRepository.PurchaseOrdersRepository,
-	pos *poService.PurchaseOrderService) common.Messenger {
+	pos *poService.PurchaseOrderService) common.DLTMessenger {
 
 	shouldConnectToMainnet := (os.Getenv("HCS_MAINNET") == "true")
 	hcsClientID := os.Getenv("HCS_CLIENT_ID")
@@ -181,11 +181,14 @@ func main() {
 	contractApiService := apiservices.NewContractService(contractRepo, cs, p2pClient)
 	purchaseOrderApiService := apiservices.NewPurchaseOrderService(por, pos, p2pClient)
 
+	nodeApiService := apiservices.NewNodeService(p2pClient)
+
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteRFP), apiRouter.NewRFPRouter(rfpApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteProposal), apiRouter.NewProposalsRouter(proposalApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RouteContract), apiRouter.NewContractsRouter(contractApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.RoutePO), apiRouter.NewPurchaseOrdersRouter(purchaseOrderApiService))
 	a.AddRouter(fmt.Sprintf("/%s", apiRouter.Swagger), apiRouter.NewSwaggerRouter())
+	a.AddRouter(fmt.Sprintf("/%s", apiRouter.Node), apiRouter.NewNodeRouter(nodeApiService))
 
 	if err := a.Start(apiPort); err != nil {
 		panic(err)

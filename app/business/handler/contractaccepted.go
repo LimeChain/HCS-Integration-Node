@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/contract/repository"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/contract/service"
@@ -13,7 +14,7 @@ import (
 
 type ContractAcceptedHandler struct {
 	contractsRepo   repository.ContractsRepository
-	dltClient       common.Messenger
+	dltClient       common.DLTMessenger
 	contractService *service.ContractService
 }
 
@@ -82,6 +83,6 @@ func (h *ContractAcceptedHandler) Handle(msg *common.Message) error {
 	return nil
 }
 
-func NewContractAcceptedHandler(contractsRepo repository.ContractsRepository, contractService *service.ContractService, dltClient common.Messenger) *ContractAcceptedHandler {
+func NewContractAcceptedHandler(contractsRepo repository.ContractsRepository, contractService *service.ContractService, dltClient common.DLTMessenger) *ContractAcceptedHandler {
 	return &ContractAcceptedHandler{contractsRepo: contractsRepo, contractService: contractService, dltClient: dltClient}
 }

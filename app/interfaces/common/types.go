@@ -22,6 +22,16 @@ type ChannelMessageHandler interface {
 type Messenger interface {
 	Listen(receiver MessageReceiver) error
 
+	Connect(peerAddress string) (bool, error)
+
+	Send(msg *Message) error
+
+	Close() error
+}
+
+type DLTMessenger interface {
+	Listen(receiver MessageReceiver) error
+
 	Send(msg *Message) error
 
 	Close() error

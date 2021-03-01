@@ -16,6 +16,37 @@
         "application/json"
     ],
     "paths": {
+        "/node": {
+            "post": {
+                "summary": "Connect to peer",
+                "tags": ["PeerConnection"],
+                "operationId": "ConnectPeer",
+                "deprecated": false,
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ConnectPeerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "headers": {}
+                    }
+                }
+            }
+        },
         "/rfp": {
             "post": {
                 "summary": "Create RFP",
@@ -330,6 +361,21 @@
         }
     },
     "definitions": {
+        "ConnectPeerRequest": {
+            "title": "ConnectPeerRequest",
+            "example": {
+                "peerAddress": "/ip4/127.0.0.1/tcp/10002/p2p/12D3KooWDd2bAkvWWABQRNju6z8xDZfKfXTG4B6tL6yXooPUPKpX"
+            },
+            "type": "object",
+            "properties": {
+                "peerAddress": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "peerAddress"
+            ]
+        },
         "CreateRFPRequest": {
             "title": "CreateRFPRequest",
             "example": {
