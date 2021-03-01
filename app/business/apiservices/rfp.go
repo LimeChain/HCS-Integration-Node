@@ -3,6 +3,7 @@ package apiservices
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	rfpModel "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/model"
 	rfpRepository "github.com/Limechain/HCS-Integration-Node/app/domain/rfp/repository"

@@ -3,6 +3,7 @@ package apiservices
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	proposalModel "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/model"
 	repository "github.com/Limechain/HCS-Integration-Node/app/domain/proposal/repository"
