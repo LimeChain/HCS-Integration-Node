@@ -95,7 +95,7 @@ func (c *LibP2PClient) prepareSignedMessage(msg *common.Message) ([]byte, error)
 	}
 
 	nodePubKey, _ := c.h.Peerstore().PubKey(c.h.ID()).Bytes()
-	peerId := c.h.ID()
+	peerId := c.h.ID().Pretty()
 
 	p2pMessage := &common.Envelope{Signature: signature, PubKeyData: nodePubKey, PeerId: peerId, Payload: msg.Msg}
 
@@ -116,7 +116,7 @@ func (c *LibP2PClient) signData(data []byte) ([]byte, error) {
 // signature: author signature provided in the message payload
 // peerId: author peer id from the message payload
 // pubKeyData: author public key from the message payload
-func (c *LibP2PClient) verifyData(data []byte, signature []byte, peerId peer.ID, pubKeyData []byte) bool {
+func (c *LibP2PClient) verifyData(data []byte, signature []byte, peerId string, pubKeyData []byte) bool {
 	key, err := crypto.UnmarshalPublicKey(pubKeyData)
 	if err != nil {
 		log.Error(err, "Failed to extract key from message key data")
@@ -132,7 +132,7 @@ func (c *LibP2PClient) verifyData(data []byte, signature []byte, peerId peer.ID,
 	}
 
 	// verify that message author node id matches the provided node public key
-	if idFromKey != peerId {
+	if idFromKey.Pretty() != peerId {
 		log.Error(err, "Node id and provided public key mismatch")
 		return false
 	}

@@ -2,8 +2,6 @@ package common
 
 import (
 	"context"
-
-	"github.com/libp2p/go-libp2p-core/peer"
 )
 
 type Message struct {
@@ -16,7 +14,7 @@ type Message struct {
 type Envelope struct {
 	Payload    []byte
 	Signature  []byte
-	PeerId     peer.ID
+	PeerId     string
 	PubKeyData []byte
 }
 
