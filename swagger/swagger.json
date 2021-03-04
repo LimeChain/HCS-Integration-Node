@@ -364,16 +364,16 @@
         "ConnectPeerRequest": {
             "title": "ConnectPeerRequest",
             "example": {
-                "peerAddress": "/ip4/127.0.0.1/tcp/10002/p2p/12D3KooWDd2bAkvWWABQRNju6z8xDZfKfXTG4B6tL6yXooPUPKpX"
+                "peerAddresses": ["/ip4/127.0.0.1/tcp/10002/p2p/12D3KooWDd2bAkvWWABQRNju6z8xDZfKfXTG4B6tL6yXooPUPKpX"]
             },
             "type": "object",
             "properties": {
-                "peerAddress": {
-                    "type": "string"
+                "peerAddresses": {
+                    "type": "array"
                 }
             },
             "required": [
-                "peerAddress"
+                "peerAddresses"
             ]
         },
         "CreateRFPRequest": {
