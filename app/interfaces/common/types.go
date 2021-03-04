@@ -11,6 +11,13 @@ type Message struct {
 	// Read more https://medium.com/@cep21/how-to-correctly-use-context-context-in-go-1-7-8f2c0fafdf39
 }
 
+type Envelope struct {
+	Payload    []byte
+	Signature  []byte
+	PeerId     string
+	PubKeyData []byte
+}
+
 type MessageReceiver interface {
 	Receive(msg *Message)
 }
