@@ -62,7 +62,7 @@ func (h *PurchaseOrderRequestHandler) Handle(msg *common.Message) error {
 		// TODO delete from db if cannot marshal
 		return err
 	}
-	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, po.BuyerId)
 
 	log.Infof("Verified and saved po with id: %s\n", purchaseOrderId)
 	return nil

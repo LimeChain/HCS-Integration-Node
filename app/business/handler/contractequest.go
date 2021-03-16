@@ -62,7 +62,7 @@ func (h *ContractRequestHandler) Handle(msg *common.Message) error {
 		// TODO delete from db if cannot marshal
 		return err
 	}
-	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, contract.BuyerId)
 
 	log.Infof("Verified and saved contract with id: %s\n", contractId)
 	return nil

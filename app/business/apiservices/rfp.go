@@ -34,7 +34,7 @@ func (s *RFPService) CreateRFP(rfp *rfpModel.RFP) (id string, err error) {
 		// TODO delete from db if cannot marshal
 		return "", err
 	}
-	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, rfp.SupplierId)
 	return rfpId, nil
 }
 

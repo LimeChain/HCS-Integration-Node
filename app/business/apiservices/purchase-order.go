@@ -45,7 +45,7 @@ func (s *PurchaseOrderService) SaveAndSendPurchaseOrder(unsignedPurchaseOrder *p
 		// TODO delete from db if cannot marshal
 		return "", "", "", err
 	}
-	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, signedPurchaseOrder.SupplierId)
 	return purchaseOrderId, purchaseOrderHash, purchaseOrderSignature, nil
 }
 

@@ -23,18 +23,17 @@ import (
 const p2pStreamName = "/hcs-int-p2p-nodes/1.0.0"
 
 type LibP2PClient struct {
-	h                  host.Host
-	messagesReadWriter *bufio.ReadWriter
-	receiver           common.MessageReceiver
-	streamPairs        map[peer.ID]string
+	h           host.Host
+	receiver    common.MessageReceiver
+	streamPairs map[peer.ID]*bufio.ReadWriter
 }
 
-func handleIncommingMessage(c *LibP2PClient, receiver common.MessageReceiver) {
+func handleIncommingMessage(c *LibP2PClient, peerId peer.ID, receiver common.MessageReceiver) {
 	go func() {
 		for {
-			msg, err := c.messagesReadWriter.ReadBytes('\n')
+			msg, err := c.streamPairs[peerId].ReadBytes('\n')
 			if err != nil {
-				c.streamPairs[c.h.ID()] = ""
+				c.streamPairs[peerId] = nil
 				return
 			}
 
@@ -54,23 +53,28 @@ func (c *LibP2PClient) Listen(receiver common.MessageReceiver) error {
 	c.receiver = receiver
 
 	c.h.SetStreamHandler(p2pStreamName, func(s network.Stream) { // I'm waiting for incomming connection
-		c.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
-		handleIncommingMessage(c, receiver)
-
-		c.streamPairs[c.h.ID()] = s.ID()
+		log.Infof("%s connected with you\n", s.Conn().RemotePeer())
+		c.streamPairs[s.Conn().RemotePeer()] = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
+		handleIncommingMessage(c, s.Conn().RemotePeer(), receiver)
 	})
 	return nil
 }
 
-func (c *LibP2PClient) Send(msg *common.Message) error {
+func (c *LibP2PClient) Send(msg *common.Message, peerAddress string) error {
 	signedMessage, err := c.prepareSignedMessage(msg)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	c.messagesReadWriter.Write(signedMessage)
-	c.messagesReadWriter.Flush()
+	peerInfo, err := c.multiAddrToPeerInfo(peerAddress)
+	if err != nil {
+		log.Errorln(err)
+		return err
+	}
+
+	c.streamPairs[peerInfo.ID].Write(signedMessage)
+	c.streamPairs[peerInfo.ID].Flush()
 	return nil
 }
 
@@ -198,10 +202,9 @@ func (c *LibP2PClient) Connect(peerAddress string) (bool, error) {
 		return false, err
 	}
 
-	c.messagesReadWriter = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
-	handleIncommingMessage(c, c.receiver)
+	handleIncommingMessage(c, ai.ID, c.receiver)
 
-	c.streamPairs[ai.ID] = s.ID()
+	c.streamPairs[ai.ID] = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
 
 	return true, nil
 }
@@ -231,7 +234,7 @@ func NewLibP2PClient(key ed25519.PrivateKey, listenIp string, listenPort string)
 	log.Infof("[LIBP2P] Started libp2p host and listening on: %s \n", addrs[0])
 
 	client := &LibP2PClient{h: h}
-	client.streamPairs = make(map[peer.ID]string)
+	client.streamPairs = make(map[peer.ID]*bufio.ReadWriter)
 
 	return client
 }

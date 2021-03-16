@@ -31,7 +31,7 @@ type Messenger interface {
 
 	Connect(peerAddress string) (bool, error)
 
-	Send(msg *Message) error
+	Send(msg *Message, peerAddress string) error
 
 	Close() error
 }

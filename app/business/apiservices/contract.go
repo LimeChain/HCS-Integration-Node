@@ -45,7 +45,7 @@ func (s *ContractService) SaveAndSendContract(unsignedContract *contractModel.Un
 		// TODO delete from db if cannot marshal
 		return "", "", "", err
 	}
-	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes})
+	s.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, signedContract.SupplierId)
 	return contractId, contractHash, contractSignature, nil
 }
 
