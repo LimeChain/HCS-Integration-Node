@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/purchase-order/repository"
@@ -19,6 +20,13 @@ type PurchaseOrderRequestHandler struct {
 }
 
 func (h *PurchaseOrderRequestHandler) Handle(msg *common.Message) error {
+	remotePeerAddressCtx := msg.Ctx.Value("remotePeerAddress")
+
+	if remotePeerAddressCtx == nil {
+		return errors.New("The remote peer address is missing")
+	}
+
+	remotePeerAddress := fmt.Sprintf("%v", remotePeerAddressCtx)
 
 	var purchaseOrderMsg messages.PurchaseOrderMessage
 	err := json.Unmarshal(msg.Msg, &purchaseOrderMsg)
@@ -62,7 +70,7 @@ func (h *PurchaseOrderRequestHandler) Handle(msg *common.Message) error {
 		// TODO delete from db if cannot marshal
 		return err
 	}
-	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, po.BuyerId)
+	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, remotePeerAddress)
 
 	log.Infof("Verified and saved po with id: %s\n", purchaseOrderId)
 	return nil

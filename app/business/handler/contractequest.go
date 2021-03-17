@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/Limechain/HCS-Integration-Node/app/business/messages"
 	"github.com/Limechain/HCS-Integration-Node/app/domain/contract/repository"
@@ -19,6 +20,13 @@ type ContractRequestHandler struct {
 }
 
 func (h *ContractRequestHandler) Handle(msg *common.Message) error {
+	remotePeerAddressCtx := msg.Ctx.Value("remotePeerAddress")
+
+	if remotePeerAddressCtx == nil {
+		return errors.New("The remote peer address is missing")
+	}
+
+	remotePeerAddress := fmt.Sprintf("%v", remotePeerAddressCtx)
 
 	var contractMsg messages.ContractMessage
 	err := json.Unmarshal(msg.Msg, &contractMsg)
@@ -62,7 +70,7 @@ func (h *ContractRequestHandler) Handle(msg *common.Message) error {
 		// TODO delete from db if cannot marshal
 		return err
 	}
-	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, contract.BuyerId)
+	h.p2pClient.Send(&common.Message{Ctx: context.TODO(), Msg: p2pBytes}, remotePeerAddress)
 
 	log.Infof("Verified and saved contract with id: %s\n", contractId)
 	return nil

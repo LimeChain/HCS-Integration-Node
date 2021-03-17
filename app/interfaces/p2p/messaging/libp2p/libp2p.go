@@ -28,12 +28,12 @@ type LibP2PClient struct {
 	streamPairs map[peer.ID]*bufio.ReadWriter
 }
 
-func handleIncommingMessage(c *LibP2PClient, peerId peer.ID, receiver common.MessageReceiver) {
+func handleIncommingMessage(c *LibP2PClient, connection network.Conn, receiver common.MessageReceiver) {
 	go func() {
 		for {
-			msg, err := c.streamPairs[peerId].ReadBytes('\n')
+			msg, err := c.streamPairs[connection.RemotePeer()].ReadBytes('\n')
 			if err != nil {
-				c.streamPairs[peerId] = nil
+				c.streamPairs[connection.RemotePeer()] = nil
 				return
 			}
 
@@ -44,7 +44,17 @@ func handleIncommingMessage(c *LibP2PClient, peerId peer.ID, receiver common.Mes
 				continue
 			}
 
-			receiver.Receive(&common.Message{Ctx: context.Background(), Msg: rawMessage})
+			remotePeerInfo := peer.AddrInfo{
+				ID:    connection.RemotePeer(),
+				Addrs: []multiaddr.Multiaddr{connection.RemoteMultiaddr()},
+			}
+
+			addrs, err := peer.AddrInfoToP2pAddrs(&remotePeerInfo)
+			if err != nil {
+				panic(err)
+			}
+
+			receiver.Receive(&common.Message{Ctx: context.WithValue(context.Background(), "remotePeerAddress", addrs[0]), Msg: rawMessage})
 		}
 	}()
 }
@@ -55,7 +65,7 @@ func (c *LibP2PClient) Listen(receiver common.MessageReceiver) error {
 	c.h.SetStreamHandler(p2pStreamName, func(s network.Stream) { // I'm waiting for incomming connection
 		log.Infof("%s connected with you\n", s.Conn().RemotePeer())
 		c.streamPairs[s.Conn().RemotePeer()] = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
-		handleIncommingMessage(c, s.Conn().RemotePeer(), receiver)
+		handleIncommingMessage(c, s.Conn(), receiver)
 	})
 	return nil
 }
@@ -202,7 +212,7 @@ func (c *LibP2PClient) Connect(peerAddress string) (bool, error) {
 		return false, err
 	}
 
-	handleIncommingMessage(c, ai.ID, c.receiver)
+	handleIncommingMessage(c, s.Conn(), c.receiver)
 
 	c.streamPairs[ai.ID] = bufio.NewReadWriter(bufio.NewReader(s), bufio.NewWriter(s))
 
